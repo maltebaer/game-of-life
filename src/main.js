@@ -14,8 +14,8 @@ let width = canvas.width;
 let height = canvas.height;
 
 // --- SET GAME PROPERTIES ---
-let resolution = 20; // size of one cell
-let radius = resolution;
+let resolution = 5; // size of one cell
+let radius = 2 * resolution;
 let cols = width / resolution;
 let rows = height / resolution;
 
@@ -34,17 +34,24 @@ blackHole.setupExploder(cols - 3 * resolution, rows - 3 * resolution);
 let ball = new Ball(0, 0, 0, radius);
 
 function checkCollision(object, game) {
+  let collision = false;
+  y = Math.floor(object.y / resolution);
+  x = Math.floor(object.x / resolution);
   switch (game.type) {
     case "health":
-      return health.grid[object.y][object.x].state === 1;
+      collision = health.grid[y][x].state === 1;
+      break;
     case "damage":
-      return damage.grid[object.y][object.x].state === 1;
+      collision = damage.grid[y][x].state === 1;
+      break;
     case "black hole":
-      return blackHole.grid[object.y][object.x].state === 1;
+      collision = blackHole.grid[y][x].state === 1;
+      break;
 
     default:
       break;
   }
+  return collision;
 }
 
 function updateEverything() {
@@ -53,7 +60,18 @@ function updateEverything() {
   blackHole.nextGeneration();
   ball.update();
   if (checkCollision(ball, health)) {
-    console.log("collision!");
+    console.log("checkCollision called HEALTH");
+    if (ball.radius < 3 * radius) {
+      ball.radius *= 1.1;
+    }
+  }
+  if (checkCollision(ball, damage)) {
+    console.log("checkCollision called DAMAGE");
+    ball.radius *= 0.9;
+  }
+  if (checkCollision(ball, blackHole)) {
+    console.log("checkCollision called BLACK HOLE");
+    ball.radius = 0;
   }
 }
 function drawEverything() {
@@ -80,20 +98,10 @@ window.onload = function() {
     console.log("START");
     running = true;
     animation();
-    // if (running) animation();
-    // else {
-    //   updateEverything();
-    //   drawEverything();
-    // }
   };
   document.querySelector(".btn-stop").onclick = function() {
     console.log("STOP");
     running = false;
-    // if (running) animation();
-    // else {
-    //   updateEverything();
-    //   drawEverything();
-    // }
   };
 
   // listen for key events
