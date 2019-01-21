@@ -14,10 +14,14 @@
     <title>Game of life</title>
   </head>
   <body>
+    <div class="content container d-flex justify-content-around">
+      <canvas width="800/10" height="1200/10"></canvas>
 
-    <canvas width="1200" height="1200"></canvas>
-
-
+      <div class="control d-flex flex-column justify-content-center">
+        <button class="btn-start btn btn-outline-secondary">START</button>
+        <button class="btn-stop btn btn-outline-danger">STOP</button>
+      </div>
+    </div>
 
     <!-- scripts and stuff -->
     <script
@@ -35,6 +39,7 @@
       integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
       crossorigin="anonymous"
     ></script>
+    <script src="./src/Ball.js"></script>
     <script src="./src/Cell.js"></script>
     <script src="./src/GameOfLife.js"></script>
     <script src="./src/utils.js"></script>
