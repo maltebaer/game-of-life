@@ -35,17 +35,25 @@ function getDistanceOfXY(x1, y1, x2, y2) {
 }
 
 function getPeriodicValue(value, length) {
-  return ((value + length) % length)
+  return (value + length) % length;
+}
+function getPeriodicArray(startIndex, periodLength, arrLengthDivisor) {
+  let arr = [];
+  for (let i = startIndex; i < periodLength/arrLengthDivisor + startIndex; i++) {
+    arr.push((i + periodLength) % periodLength);
+  }
+  return arr;
 }
 
 function convertBallToGrid(coordianteBall, resolution) {
-  return Math.floor(coordianteBall / resolution)
+  return Math.floor(coordianteBall / resolution);
 }
 
 function checkCollision(object, game) {
   let collision = false;
   y = convertBallToGrid(object.y, resolution);
   x = convertBallToGrid(object.x, resolution);
+  // x = Math.floor(object.x / resolution);
   switch (game.type) {
     case "health":
       collision = game.grid[y][x].state === 1;
@@ -70,22 +78,27 @@ function checkCollision(object, game) {
 }
 
 function gameOver(object, radius) {
-  if (object.radius < radius/3) return true
+  if (object.radius < radius / 3) return true;
+}
+function gainHealth(object, radius) {
+  if (object.radius < 2.5 * radius) return true;
 }
 
-function cellColor(type, generationsDead = 0) {
+function cellColor(color, generationsDead = 0) {
   let alpha = 1 - generationsDead / 5;
-  switch (type) {
-    case "black hole":
+  switch (color) {
+    case "dark blue":
       return `rgba(51, 102, 255, ${alpha})`;
-    case "portal":
+    case "light blue":
       return `rgba(153, 179, 255, ${alpha})`;
-    case "health":
+    case "yellow":
       return `rgba(255, 255, 0, ${alpha})`;
-    case "damage":
+    case "red":
       return `rgba(255, 0, 0, ${alpha})`;
+    case "green":
+      return `rgba(0, 255, 0, ${alpha})`;
 
     default:
-      return `rgba(0, 255, 0, ${alpha})`;
+      return `rgba(255, 255, 255, ${alpha})`;
   }
 }

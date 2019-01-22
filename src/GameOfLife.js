@@ -1,13 +1,14 @@
 class GameOfLife {
-  constructor(rows, cols, populationDensity, type, maxAge = false) {
+  constructor(rows, cols, populationDensity, type, color, maxAge = false) {
     // properties of the grid
     this.rows = rows;
     this.cols = cols;
     this.grid;
     // propeties defining the cell behaviour
-    this.type = type;
-    this.maxAge = maxAge;
     this.populationDensity = populationDensity;
+    this.type = type;
+    this.color = color;
+    this.maxAge = maxAge;
 
     // this.setup();
   }
@@ -114,7 +115,10 @@ class GameOfLife {
             this.type
           );
         }
-        if (i === 2 && (j === 0 || j === 1 || j === 9 || j === 10 || j === 22 || j === 23)) {
+        if (
+          i === 2 &&
+          (j === 0 || j === 1 || j === 9 || j === 10 || j === 22 || j === 23)
+        ) {
           this.grid[i + yPosition][j + xPosition] = new Cell(
             j + xPosition,
             i + yPosition,
@@ -138,7 +142,7 @@ class GameOfLife {
             this.type
           );
         }
-        if (i === 5 && (j === 16 || j === 18 )) {
+        if (i === 5 && (j === 16 || j === 18)) {
           this.grid[i + yPosition][j + xPosition] = new Cell(
             j + xPosition,
             i + yPosition,
@@ -146,7 +150,7 @@ class GameOfLife {
             this.type
           );
         }
-        if (i === 6 && (j === 16)) {
+        if (i === 6 && j === 16) {
           this.grid[i + yPosition][j + xPosition] = new Cell(
             j + xPosition,
             i + yPosition,
@@ -170,7 +174,7 @@ class GameOfLife {
             this.type
           );
         }
-        if (i === 9 && (j === 35)) {
+        if (i === 9 && j === 35) {
           this.grid[i + yPosition][j + xPosition] = new Cell(
             j + xPosition,
             i + yPosition,
@@ -186,7 +190,7 @@ class GameOfLife {
             this.type
           );
         }
-        if (i === 13 && (j === 24)) {
+        if (i === 13 && j === 24) {
           this.grid[i + yPosition][j + xPosition] = new Cell(
             j + xPosition,
             i + yPosition,
@@ -194,7 +198,7 @@ class GameOfLife {
             this.type
           );
         }
-        if (i === 14 && (j === 25)) {
+        if (i === 14 && j === 25) {
           this.grid[i + yPosition][j + xPosition] = new Cell(
             j + xPosition,
             i + yPosition,
@@ -206,41 +210,90 @@ class GameOfLife {
     }
   }
 
+  
   draw(ctx) {
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
         let y = i * resolution;
         let x = j * resolution;
         if (this.grid[i][j].state === 1) {
-          ctx.fillStyle = cellColor(this.type);
+          ctx.fillStyle = cellColor(this.color);
           ctx.fillRect(x, y, resolution, resolution);
         }
         if (
           this.grid[i][j].state === 0 &&
           this.grid[i][j].generationsDead === 1
         ) {
-          ctx.fillStyle = cellColor(this.type, this.grid[i][j].generationsDead);
+          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
           ctx.fillRect(x, y, resolution, resolution);
         }
         if (
           this.grid[i][j].state === 0 &&
           this.grid[i][j].generationsDead === 2
         ) {
-          ctx.fillStyle = cellColor(this.type, this.grid[i][j].generationsDead);
+          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
           ctx.fillRect(x, y, resolution, resolution);
         }
         if (
           this.grid[i][j].state === 0 &&
           this.grid[i][j].generationsDead === 3
         ) {
-          ctx.fillStyle = cellColor(this.type, this.grid[i][j].generationsDead);
+          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
           ctx.fillRect(x, y, resolution, resolution);
         }
         if (
           this.grid[i][j].state === 0 &&
           this.grid[i][j].generationsDead === 4
         ) {
-          ctx.fillStyle = cellColor(this.type, this.grid[i][j].generationsDead);
+          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+      }
+    }
+  }
+
+  drawLimitedSight(ctx, object) {
+    let iArr = getPeriodicArray(convertBallToGrid(object.y - 165, resolution), 180, 4);
+    let jArr = getPeriodicArray(convertBallToGrid(object.x - 140, resolution), 120, 3);
+
+    // console.log("iArr", iArr);
+    // console.log("jArr", jArr);
+    
+    for (let i = 0; i < iArr.length; i++) {
+      for (let j = 0; j < jArr.length; j++) {
+        let y = iArr[i] * resolution;
+        let x = jArr[j] * resolution;
+
+        if (this.grid[iArr[i]][jArr[j]].state === 1) {
+          ctx.fillStyle = cellColor(this.color);
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+        if (
+          this.grid[i][j].state === 0 &&
+          this.grid[i][j].generationsDead === 1
+        ) {
+          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+        if (
+          this.grid[i][j].state === 0 &&
+          this.grid[i][j].generationsDead === 2
+        ) {
+          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+        if (
+          this.grid[i][j].state === 0 &&
+          this.grid[i][j].generationsDead === 3
+        ) {
+          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+        if (
+          this.grid[i][j].state === 0 &&
+          this.grid[i][j].generationsDead === 4
+        ) {
+          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
           ctx.fillRect(x, y, resolution, resolution);
         }
       }
@@ -275,7 +328,7 @@ class GameOfLife {
     }
   }
 
-  nextGeneration() {
+  update() {
     this.countNeighbours();
 
     let gridNew = this.grid;

@@ -3,6 +3,7 @@
 
 // --- TO DO/IDEAS ---
 //  - implement area of visibility/just show frame around ball
+//    - make it round
 //  - make black hole attract damage cells
 //  - make black hole erase all cells
 //  - implement more worlds
@@ -13,6 +14,8 @@
 //    - other patterns to collect in the other worlds
 //  - make ball pixely
 //  - add music
+//  - add pixel frame
+//  - make variables const
 
 //
 // --- GLOBAL VARIABLES ---
@@ -20,12 +23,14 @@
 let canvas = document.querySelector("canvas");
 let ctx = canvas.getContext("2d");
 
-let width = canvas.width;
-let height = canvas.height;
+// let width = canvas.width;
+// let height = canvas.height;
+let width = 800;
+let height = 1200;
 
 //
 // ___ SET GAME PROPERTIES ___
-// canvas size: 800 x 1200 ==> ratio: 2 / 3
+// // canvas size: 800 x 1200 ==> ratio: 2 / 3
 let ratio = width / height;
 // cols and rows are dependend in order to make pixels appear squared
 let cols = 120;
@@ -39,40 +44,36 @@ let maxAge = false;
 
 let intervalId;
 
+let level = 0;
+
 //
 // --- INITIALISE GAME ---
-// ___ MAIN WORLD ___
-let health = new GameOfLife(
-  rows,
-  cols,
-  0.5 * populationDensity,
-  "health",
-  maxAge
-);
-health.setup();
-let damage = new GameOfLife(rows, cols, populationDensity, "damage", maxAge);
-damage.setup();
-let blackHole = new GameOfLife(rows, cols, 0, "black hole");
-blackHole.setupExploder(cols - cols / 5, rows - rows / 6);
-let gliderGun = new GameOfLife(rows, cols, 0, "damage");
-gliderGun.setupGilderGun(rows / 5, cols / 5);
+let ball = new Ball(300, 300, 0, radius);
 
-let ball = new Ball(cols / 2, rows / 2, 0, radius);
+// ___ MAIN WORLD ___
+let health = new GameOfLife(rows, cols, 0.6 * populationDensity, "health", "yellow", maxAge);
+health.setup();
+let damage = new GameOfLife(rows, cols, populationDensity, "damage", "red", maxAge);
+damage.setup();
+let gliderGun = new GameOfLife(rows, cols, 0, "damage", "red");
+gliderGun.setupGilderGun(rows / 5, cols / 5);
+let blackHole = new GameOfLife(rows, cols, 0, "black hole", "dark blue");
+blackHole.setupExploder(cols - cols / 5, rows - rows / 6);
+let portal = new GameOfLife(rows, cols, 0, "portal", "light blue");
+portal.setupPortal(cols / 6, rows - rows / 3, "horizontal");
+
+let mainWorld = [0, "limited", ball, health, damage, blackHole, gliderGun, portal];
 
 //
 // ___ WORLD1 ___
-let portal1 = new GameOfLife(rows, cols, 0, "portal");
-portal1.setupPortal(cols / 6, rows - rows / 3, "horizontal");
-let health1 = new GameOfLife(rows, cols, populationDensity, "health", maxAge);
+let health1 = new GameOfLife(rows, cols, 0.6 * populationDensity, "health", "green", maxAge);
 health1.setup();
-let damage1 = new GameOfLife(
-  rows,
-  cols,
-  0.1 * populationDensity,
-  "damage",
-  maxAge
-);
+let damage1 = new GameOfLife(rows, cols, 1.2 * populationDensity, "damage", "red", maxAge);
 damage1.setup();
+// let portal1 = new GameOfLife(rows, cols, 0, "portal");
+// portal1.setupPortal(cols / 6, rows - rows / 3, "horizontal");
+
+let world1 = [1, "full", ball, health1, damage1, portal];
 
 // let portal2 = new GameOfLife(rows, cols, 0, "portal");
 // portal2.setupPortal(cols - 10 * resolution, rows - 40 * resolution, "vertical");
@@ -80,143 +81,86 @@ damage1.setup();
 //
 // --- GAME LOGIC AND DRAWING ---
 // ___ MAIN WORLD ___
-function updateEverything() {
-  // update game of life objects
-  health.nextGeneration();
-  damage.nextGeneration();
-  blackHole.nextGeneration();
-  portal1.nextGeneration();
-  gliderGun.nextGeneration();
-
-  // update ball
-  ball.update();
-
-  // check for collision
-  if (checkCollision(ball, health)) {
-    console.log("checkCollision called HEALTH");
-    if (ball.radius < 2.5 * radius) {
-      ball.radius *= 1.1;
-      ball.speed *= 1.1;
+function updateEverything(world) {
+  world[2].update();
+  for (let i = 3; i < world.length; i++) {
+    world[i].update();
+    if (checkCollision(world[2], world[i]) && world[i].type === "health") {
+      console.log("checkCollision called HEALTH");
+      if (gainHealth(ball, radius)) {
+        ball.radius *= 1.1;
+        ball.speed *= 1.1;
+      }
     }
-  }
-  if (checkCollision(ball, damage)) {
-    console.log("checkCollision called DAMAGE");
-    if (!gameOver(ball, radius)) {
-      ball.radius *= 0.9;
-      ball.speed *= 0.9;
-    } else {
+    if (checkCollision(world[2], world[i]) && world[i].type === "damage") {
+      console.log("checkCollision called DAMAGE");
+      if (!gameOver(ball, radius)) {
+        ball.radius *= 0.9;
+        ball.speed *= 0.9;
+      } else {
+        ball.radius = 0;
+        ball.speed = 0;
+        stop();
+      }
+    }
+    if (checkCollision(world[2], world[i]) && world[i].type === "black hole") {
+      console.log("checkCollision called BLACK HOLE");
       ball.radius = 0;
       ball.speed = 0;
       stop();
     }
-  }
-  if (checkCollision(ball, gliderGun)) {
-    console.log("checkCollision called GLIDER GUN");
-    if (!gameOver(ball, radius)) {
-      ball.radius *= 0.9;
-      ball.speed *= 0.9;
-    } else {
-      ball.radius = 0;
-      ball.speed = 0;
+    if (checkCollision(world[2], world[i]) && world[i].type === "portal") {
+      console.log("checkCollision called PORTAL");
       stop();
+      if (world !== mainWorld) level = 0
+      level = 1;
+      intervalId = setInterval(animation, 1000 / 60);
     }
-  }
-  if (checkCollision(ball, blackHole)) {
-    console.log("checkCollision called BLACK HOLE");
-    ball.radius = 0;
-    ball.speed = 0;
-    stop();
-  }
-  if (checkCollision(ball, portal1)) {
-    console.log("checkCollision called PORTAL1");
-    // ball.radius = 0;
-    // ball.speed = 0;
-    stop();
-    intervalId = setInterval(animation1, 1000 / 60);
   }
 }
 
-function drawEverything() {
+function drawEverything(world) {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "rgb(0, 0, 0)";
   ctx.fillRect(0, 0, width, height);
 
-  health.draw(ctx);
-  damage.draw(ctx);
-  blackHole.draw(ctx);
-  portal1.draw(ctx);
-  gliderGun.draw(ctx);
+  for (let i = 3; i < world.length; i++) {
+    if (world[1] === "limited") {
+      world[i].drawLimitedSight(ctx, ball);
+    } else {
+      world[i].draw(ctx);
+    }
+  }
 
-  ball.draw(ctx);
+  world[2].draw(ctx);
 }
 function animation() {
-  updateEverything();
-  drawEverything();
+  switch (level) {
+    case 0:
+      updateEverything(mainWorld);
+      drawEverything(mainWorld, mainWorld[0]);
+      break;
+    case 1:
+      updateEverything(world1);
+      drawEverything(world1, world1[0]);
+      break;
+
+    default:
+      break;
+  }
 }
 function stop() {
   clearInterval(intervalId);
 }
 
 //
-// ___ WORLD1 ___
-function updateEverything1() {
-  // update game of life objects
-  health1.nextGeneration();
-  damage1.nextGeneration();
-  portal1.nextGeneration();
-
-  // update ball
-  ball.update();
-
-  // check for collision
-  if (checkCollision(ball, health1)) {
-    console.log("checkCollision called HEALTH");
-    if (ball.radius < 3 * radius) {
-      ball.radius *= 1.1;
-      ball.speed *= 1.1;
-    }
-  }
-  if (checkCollision(ball, damage1)) {
-    console.log("checkCollision called DAMAGE");
-    if (ball.radius > (1 / 3) * radius) {
-      ball.radius *= 0.9;
-      ball.speed *= 0.9;
-    } else {
-      ball.radius = 0;
-      ball.speed = 0;
-    }
-  }
-  if (checkCollision(ball, portal1)) {
-    console.log("checkCollision called PORTAL1");
-    ball.radius = 0;
-    ball.speed = 0;
-  }
-}
-function drawEverything1() {
-  ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = "rgb(0, 0, 0)";
-  ctx.fillRect(0, 0, width, height);
-
-  health1.draw(ctx);
-  damage1.draw(ctx);
-  portal1.draw(ctx);
-
-  ball.draw(ctx);
-}
-
-function animation1() {
-  updateEverything1();
-  drawEverything1();
-}
-
-//
 // --- USER INTERFACE ---
 window.onload = function() {
-  drawEverything();
+  drawEverything(mainWorld);
 
   document.querySelector(".btn-start").onclick = function() {
     console.log("START");
-    intervalId = setInterval(animation, 1000 / 60);
+    intervalId = setInterval(animation, 1000 / 30);
   };
   document.querySelector(".btn-stop").onclick = function() {
     console.log("STOP");
