@@ -1,11 +1,13 @@
 class GameOfLife {
   constructor(rows, cols, populationDensity, type, maxAge = false) {
+    // properties of the grid
     this.rows = rows;
     this.cols = cols;
-    this.populationDensity = populationDensity;
-    this.type = type;
     this.grid;
+    // propeties defining the cell behaviour
+    this.type = type;
     this.maxAge = maxAge;
+    this.populationDensity = populationDensity;
 
     // this.setup();
   }
@@ -52,6 +54,156 @@ class GameOfLife {
       }
     }
     // console.table(this.grid);
+  }
+
+  setupPortal(xPosition, yPosition, alignment) {
+    this.grid = create2DArray(this.rows, this.cols);
+
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        this.grid[y][x] = new Cell(x, y, 0, this.type);
+      }
+    }
+    if (alignment === "vertical") {
+      for (let i = 0; i < 10; i++) {
+        this.grid[i + yPosition][xPosition] = new Cell(
+          xPosition,
+          i + yPosition,
+          1,
+          this.type
+        );
+      }
+    }
+    if (alignment === "horizontal") {
+      for (let j = 0; j < 10; j++) {
+        this.grid[yPosition][j + xPosition] = new Cell(
+          j + xPosition,
+          yPosition,
+          1,
+          this.type
+        );
+      }
+    }
+
+    // console.table(this.grid);
+  }
+
+  setupGilderGun(xPosition, yPosition, amount) {
+    this.grid = create2DArray(this.rows, this.cols);
+
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        this.grid[y][x] = new Cell(x, y, 0, this.type);
+      }
+    }
+    for (let i = 0; i < 15; i++) {
+      for (let j = 0; j < 38; j++) {
+        if (i === 0 && (j === 23 || j === 24 || j === 34 || j === 35)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 1 && (j === 22 || j === 24 || j === 34 || j === 35)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 2 && (j === 0 || j === 1 || j === 9 || j === 10 || j === 22 || j === 23)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 3 && (j === 0 || j === 1 || j === 8 || j === 10)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 4 && (j === 8 || j === 9 || j === 16 || j === 17)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 5 && (j === 16 || j === 18 )) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 6 && (j === 16)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 7 && (j === 35 || j === 36)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 8 && (j === 35 || j === 37)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 9 && (j === 35)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 12 && (j === 24 || j === 25 || j === 26)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 13 && (j === 24)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+        if (i === 14 && (j === 25)) {
+          this.grid[i + yPosition][j + xPosition] = new Cell(
+            j + xPosition,
+            i + yPosition,
+            1,
+            this.type
+          );
+        }
+      }
+    }
   }
 
   draw(ctx) {
@@ -106,9 +258,14 @@ class GameOfLife {
         } else {
           for (let i = -1; i < 2; i++) {
             for (let j = -1; j < 2; j++) {
-              let row = (y + j + this.rows) % this.rows;
-              let col = (x + i + this.cols) % this.cols;
-              if (this.grid[row][col].state === 1) sum++;
+              // let row = (y + j + this.rows) % this.rows;
+              // let col = (x + i + this.cols) % this.cols;
+              if (
+                this.grid[getPeriodicValue(y + j, this.rows)][
+                  getPeriodicValue(x + i, this.cols)
+                ].state === 1
+              )
+                sum++;
             }
           }
           sum -= this.grid[y][x].state;

@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 function create2DArray(rows, cols) {
   let arr = new Array(rows);
@@ -27,15 +27,59 @@ function drawCoordinates(ctx) {
   ctx.restore();
 }
 
-function getDistance(obj1, obj2) {
+function getDistanceOfObjects(obj1, obj2) {
   return Math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2);
+}
+function getDistanceOfXY(x1, y1, x2, y2) {
+  return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+}
+
+function getPeriodicValue(value, length) {
+  return ((value + length) % length)
+}
+
+function convertBallToGrid(coordianteBall, resolution) {
+  return Math.floor(coordianteBall / resolution)
+}
+
+function checkCollision(object, game) {
+  let collision = false;
+  y = convertBallToGrid(object.y, resolution);
+  x = convertBallToGrid(object.x, resolution);
+  switch (game.type) {
+    case "health":
+      collision = game.grid[y][x].state === 1;
+      break;
+    case "damage":
+    case "black hole":
+    case "portal":
+      for (let i = -1; i < 2; i++) {
+        for (let j = -1; j < 2; j++) {
+          if (
+            game.grid[getPeriodicValue(y + j, game.rows)][
+              getPeriodicValue(x + i, game.cols)
+            ].state === 1
+          ) {
+            collision = true;
+          }
+        }
+      }
+      break;
+  }
+  return collision;
+}
+
+function gameOver(object, radius) {
+  if (object.radius < radius/3) return true
 }
 
 function cellColor(type, generationsDead = 0) {
   let alpha = 1 - generationsDead / 5;
   switch (type) {
     case "black hole":
-      return `rgba(255, 255, 255, ${alpha})`;
+      return `rgba(51, 102, 255, ${alpha})`;
+    case "portal":
+      return `rgba(153, 179, 255, ${alpha})`;
     case "health":
       return `rgba(255, 255, 0, ${alpha})`;
     case "damage":
