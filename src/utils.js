@@ -61,6 +61,7 @@ function checkCollision(object, game) {
     case "damage":
     case "black hole":
     case "portal":
+    case "item":
       for (let i = -1; i < 2; i++) {
         for (let j = -1; j < 2; j++) {
           if (
@@ -97,6 +98,8 @@ function cellColor(color, generationsDead = 0) {
       return `rgba(255, 0, 0, ${alpha})`;
     case "green":
       return `rgba(0, 255, 0, ${alpha})`;
+    case "pink":
+      return `rgba(255, 102, 153, ${alpha})`;
 
     default:
       return `rgba(255, 255, 255, ${alpha})`;

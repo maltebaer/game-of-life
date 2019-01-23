@@ -9,8 +9,6 @@ class GameOfLife {
     this.type = type;
     this.color = color;
     this.maxAge = maxAge;
-
-    // this.setup();
   }
 
   setup() {
@@ -269,31 +267,31 @@ class GameOfLife {
           ctx.fillRect(x, y, resolution, resolution);
         }
         if (
-          this.grid[i][j].state === 0 &&
-          this.grid[i][j].generationsDead === 1
+          this.grid[iArr[i]][jArr[j]].state === 0 &&
+          this.grid[iArr[i]][jArr[j]].generationsDead === 1
         ) {
-          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
+          ctx.fillStyle = cellColor(this.color, this.grid[iArr[i]][jArr[j]].generationsDead);
           ctx.fillRect(x, y, resolution, resolution);
         }
         if (
-          this.grid[i][j].state === 0 &&
-          this.grid[i][j].generationsDead === 2
+          this.grid[iArr[i]][jArr[j]].state === 0 &&
+          this.grid[iArr[i]][jArr[j]].generationsDead === 2
         ) {
-          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
+          ctx.fillStyle = cellColor(this.color, this.grid[iArr[i]][jArr[j]].generationsDead);
           ctx.fillRect(x, y, resolution, resolution);
         }
         if (
-          this.grid[i][j].state === 0 &&
-          this.grid[i][j].generationsDead === 3
+          this.grid[iArr[i]][jArr[j]].state === 0 &&
+          this.grid[iArr[i]][jArr[j]].generationsDead === 3
         ) {
-          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
+          ctx.fillStyle = cellColor(this.color, this.grid[iArr[i]][jArr[j]].generationsDead);
           ctx.fillRect(x, y, resolution, resolution);
         }
         if (
-          this.grid[i][j].state === 0 &&
-          this.grid[i][j].generationsDead === 4
+          this.grid[iArr[i]][jArr[j]].state === 0 &&
+          this.grid[iArr[i]][jArr[j]].generationsDead === 4
         ) {
-          ctx.fillStyle = cellColor(this.color, this.grid[i][j].generationsDead);
+          ctx.fillStyle = cellColor(this.color, this.grid[iArr[i]][jArr[j]].generationsDead);
           ctx.fillRect(x, y, resolution, resolution);
         }
       }

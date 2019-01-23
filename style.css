@@ -1,15 +1,30 @@
 body {
-  margin-top: 30px;
+  margin: 30px 0px;
+}
+
+.item {
+  background-color: black;
+  color: white;
+  width: 100px;
+  height: 100px;
+  margin: 10px;
+  text-align: center;
+}
+
+/* .item.health {
+
+} */
+
+.collected {
+  opacity: 0.2;
 }
 
 canvas {
-  border: 1px solid red;
-}
-
-.control {
-  width: 150px;
+  /* height: calc(100vh - 60px); */
+  height: calc(100vh - 60px);
+  width: calc((2/3) * calc(100vh - 60px));
 }
 
 .control button {
-  margin: 5px;
+  margin: 10px;
 }
