@@ -1,28 +1,28 @@
 body {
   margin: 30px 0px;
+  background-color: black;
 }
 
 .item {
-  background-color: black;
-  color: white;
+  /* background-color: black;
+  color: white; */
   width: 100px;
   height: 100px;
   margin: 10px;
-  text-align: center;
+  /* text-align: center; */
 }
 
-/* .item.health {
-
-} */
+.highlighted {
+  border: 2px solid white;
+}
 
 .collected {
   opacity: 0.2;
 }
 
 canvas {
-  /* height: calc(100vh - 60px); */
   height: calc(100vh - 60px);
-  width: calc((2/3) * calc(100vh - 60px));
+  width: calc((2 / 3) * calc(100vh - 60px));
 }
 
 .control button {
