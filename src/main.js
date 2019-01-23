@@ -1,6 +1,3 @@
-// --- NOT WORKING ---
-//  - start/stop
-
 // --- TO DO/IDEAS ---
 //  - add restart
 //  - add explanation
@@ -75,7 +72,6 @@ let itemsCollected = 0;
 
 let ball;
 
-//
 // ___ MODELS ___
 let blackHoleModel;
 let portalModel;
@@ -88,7 +84,6 @@ let item5Model;
 
 let models;
 
-//
 // ___ MAIN WORLD ___
 let health;
 let damage;
@@ -99,7 +94,6 @@ let portal2;
 
 let mainWorld;
 
-//
 // ___ WORLD1 ___
 let health1;
 let damage1;
@@ -107,7 +101,6 @@ let item1;
 
 let world1;
 
-//
 // ___ WORLD2 ___
 let health2;
 let damage2;
@@ -172,7 +165,7 @@ function newGame() {
 
   mainWorld = [
     0,
-    "full",
+    "limited",
     ball,
     health,
     damage,
