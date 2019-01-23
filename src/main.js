@@ -1,15 +1,12 @@
 // --- TO DO/IDEAS ---
-//  - add restart
+//  - add game controls
 //  - add explanation
-//  - add little games
 //  - add music
-//  - add pixel frame
 //  - add color gradient
 //  - make variables const
 //  - mobile version
 //  - implement area of visibility/just show frame around ball
 //    - make it round
-//  - implement more worlds
 //  - make ball pixely
 //  - implement shooting feature
 //  - make black hole attract damage cells
@@ -255,14 +252,14 @@ function updateEverything(world) {
     }
     if (checkCollision(world[2], world[i]) && world[i].type === "damage") {
       // console.log("checkCollision called DAMAGE");
-      // if (!gameOver(ball, radius)) {
-      //   ball.radius *= 0.9;
-      //   ball.speed *= 0.9;
-      // } else {
-      //   ball.radius = 0;
-      //   ball.speed = 0;
-      //   stop();
-      // }
+      if (!gameOver(ball, radius)) {
+        ball.radius *= 0.9;
+        ball.speed *= 0.9;
+      } else {
+        ball.radius = 0;
+        ball.speed = 0;
+        stop();
+      }
     }
     if (checkCollision(world[2], world[i]) && world[i].type === "black hole" && !justHitBlackHole) {
       // console.log("checkCollision called BLACK HOLE");
@@ -444,12 +441,7 @@ window.onload = function() {
   ctx.fillStyle = "rgb(0, 0, 0)";
   ctx.fillRect(0, 0, width, height);
   initModels();
-  // updateModels();
-  // drawModels();
   setInterval(animateModels, 100);
-  // level = 5;
-  // newGame();
-  // intervalId = setInterval(animation, 100);
 
   document.querySelector(".btn-start").onclick = function() {
     // console.log("START");
