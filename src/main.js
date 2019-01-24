@@ -69,11 +69,11 @@ const MAX_AGE = false;
 // ANIMATION PROPERTIES
 let static = false;
 
-let setIntervalUsed = true;
+let setIntervalUsed = false;
 let setIntervalUsedModels = true;
 let intervalId;
 let frameRate = 100;
-let requestAnimationFrameUsed = false;
+let requestAnimationFrameUsed = true;
 let requestAnimationFrameUsedModels = false;
 let requestId;
 
@@ -388,9 +388,10 @@ function updateEverything(world) {
         itemsCollected++;
       }
     }
-  } else {
-    stop();
-  }
+  } 
+  // else {
+  //   stop();
+  // }
 }
 function drawEverything(world) {
   ctx.clearRect(0, 0, width, height);
