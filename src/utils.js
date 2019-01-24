@@ -39,7 +39,7 @@ function getPeriodicValue(value, length) {
 }
 function getPeriodicArray(startIndex, periodLength, arrLengthDivisor) {
   let arr = [];
-  for (let i = startIndex; i < periodLength/arrLengthDivisor + startIndex; i++) {
+  for (let i = startIndex; i < periodLength / arrLengthDivisor + startIndex; i++) {
     arr.push((i + periodLength) % periodLength);
   }
   return arr;
@@ -51,31 +51,32 @@ function convertBallToGrid(coordianteBall, resolution) {
 
 function checkCollision(object, game) {
   let collision = false;
+
   y = convertBallToGrid(object.y, resolution);
   x = convertBallToGrid(object.x, resolution);
-  // x = Math.floor(object.x / resolution);
-  switch (game.type) {
-    case "health":
-      collision = game.grid[y][x].state === 1;
-      break;
-    case "damage":
-    case "black hole":
-    case "portal":
-    case "item":
-      for (let i = -1; i < 2; i++) {
-        for (let j = -1; j < 2; j++) {
-          if (
-            game.grid[getPeriodicValue(y + j, game.rows)][
-              getPeriodicValue(x + i, game.cols)
-            ].state === 1
-          ) {
-            collision = true;
-          }
+
+  let type = game.grid[y][x].type;
+
+  if (
+    type.includes("damage") ||
+    type.includes("portal") ||
+    type.includes("black hole") ||
+    type.includes("item")
+  ) {
+    for (let i = -1; i < 2; i++) {
+      for (let j = -1; j < 2; j++) {
+        if (
+          game.grid[getPeriodicValue(y + j, game.rows)][getPeriodicValue(x + i, game.cols)]
+            .state === 1
+        ) {
+          collision = true;
         }
       }
-      break;
+    }
+  } else if (type.includes("health")) {
+    collision = game.grid[y][x].state === 1;
   }
-  return collision;
+  return [collision, type];
 }
 
 function gameOver(object, radius) {

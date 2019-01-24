@@ -1,8 +1,10 @@
 // --- TO DO/IDEAS ---
 //  - add game controls
+//  - add max speed
 //  - add explanation
 //  - add music
 //  - add color gradient
+//  - add ball size to checkCollision
 //  - make variables const
 //  - mobile version
 //  - implement area of visibility/just show frame around ball
@@ -14,13 +16,14 @@
 //  - implement initial conditions
 //    - patterns to collect in the other worlds
 
-//
-// --- GLOBAL VARIABLES ---
-// ___ GET CANVAS PROPERTIES ___
+/**************************** 
+  --- GLOBAL VARIABLES ---
+****************************/
+// GET CANVAS PROPERTIES
 let canvas = document.querySelector("#main");
 let ctx = canvas.getContext("2d");
 
-// ___ GET CANVAS PROTPERTIES FOR MODELS ___
+// GET CANVAS PROPERTIES FOR MODELS
 let canvasBlackHole = document.querySelector("#black-hole");
 let ctxBlackHole = canvasBlackHole.getContext("2d");
 let canvasPortal = document.querySelector("#portal");
@@ -47,9 +50,7 @@ let modelHeight = 200;
 let width = 800;
 let height = 1200;
 
-//
-// ___ SET GAME PROPERTIES ___
-// // canvas size: 800 x 1200 ==> ratio: 2 / 3
+// SET GAME PROPERTIES
 let ratio = width / height;
 // cols and rows are dependend in order to make pixels appear squared
 let cols = 120;
@@ -63,13 +64,16 @@ let maxAge = false;
 
 let intervalId;
 let level = 0;
+let justHitDamage = false;
+let justHitHealth = false;
 let justHitPortal = false;
 let justHitBlackHole = false;
 let itemsCollected = 0;
+let frameRate = 1000 / 60;
 
 let ball;
 
-// ___ MODELS ___
+// MODELS
 let blackHoleModel;
 let portalModel;
 
@@ -81,50 +85,74 @@ let item5Model;
 
 let models;
 
-// ___ MAIN WORLD ___
-let health;
+// MAIN WORLD
 let damage;
-let gliderGun;
-let blackHole;
-let portal1;
-let portal2;
+let mainLandscape;
 
 let mainWorld;
 
-// ___ WORLD1 ___
-let health1;
+// WORLD1
 let damage1;
+let landscape1;
 let item1;
 
 let world1;
 
-// ___ WORLD2 ___
-let health2;
+// WORLD2
 let damage2;
+let landscape2;
 let item2;
 
 let world2;
 
-//
-// --- INITIALISE GAME ---
-function initModels() {
-  //
-  // ___ MODELS ___
-  blackHoleModel = new GameOfLife(30, 30, 0, "black hole", "dark blue");
-  blackHoleModel.setupExploder(12, 13);
-  portalModel = new GameOfLife(30, 30, 0, "portal", "light blue");
-  portalModel.setupPortal(14, 11, "vertical");
+// WORLD3
+let damage3;
+let landscape3;
+let item3;
 
-  item1Model = new GameOfLife(30, 30, 0, "item", "pink");
-  item1Model.setupBlinker(6, 6);
-  item2Model = new GameOfLife(30, 30, 0, "item", "pink");
-  item2Model.setupBeacon(5, 6);
-  item3Model = new GameOfLife(30, 30, 0, "item", "pink");
-  item3Model.setupToad(6, 6);
-  item4Model = new GameOfLife(30, 30, 0, "item", "pink");
-  item4Model.setupClock(6, 6);
-  item5Model = new GameOfLife(30, 30, 0, "item", "pink");
-  item5Model.setupBipole(5, 5);
+let world3;
+
+// WORLD4
+let damage4;
+let landscape4;
+let item4;
+
+let world4;
+
+// WORLD5
+let damage5;
+let landscape5;
+let item5;
+
+let world5;
+
+/**************************** 
+  --- INITIALISE GAME ---
+****************************/
+function initModels() {
+  // MODELS
+  blackHoleModel = new GameOfLife(30, 30, 0);
+  blackHoleModel.setup("black hole", "dark blue", 0);
+  blackHoleModel.setupExploder(12, 13, "black hole", "dark blue");
+  portalModel = new GameOfLife(30, 30, 0);
+  portalModel.setup("portal", "light blue", 0);
+  portalModel.setupPortal(14, 11, "portal", "light blue", "vertical");
+
+  item1Model = new GameOfLife(30, 30, 0);
+  item1Model.setup("item", "pink", 0);
+  item1Model.setupBlinker(6, 6, "item", "pink");
+  item2Model = new GameOfLife(30, 30, 0);
+  item2Model.setup("item", "pink", 0);
+  item2Model.setupBeacon(5, 6, "item", "pink");
+  item3Model = new GameOfLife(30, 30, 0);
+  item3Model.setup("item", "pink", 0);
+  item3Model.setupToad(6, 6, "item", "pink");
+  item4Model = new GameOfLife(30, 30, 0);
+  item4Model.setup("item", "pink", 0);
+  item4Model.setupClock(6, 6, "item", "pink");
+  item5Model = new GameOfLife(30, 30, 0);
+  item5Model.setup("item", "pink", 0);
+  item5Model.setupBipole(5, 5, "item", "pink");
 
   models = [
     blackHoleModel,
@@ -137,103 +165,86 @@ function initModels() {
   ];
 }
 
-function newGame() {
+function initNewGame() {
   ball = new Ball(300, 300, 0, radius);
+  // MAIN WORLD
+  damage = new GameOfLife(rows, cols, maxAge);
+  damage.setup("damage", "red", 0.8 * populationDensity);
+  mainLandscape = new GameOfLife(rows, cols, maxAge);
+  mainLandscape.setup("health", "yellow", 1.2 * populationDensity);
+  mainLandscape.setupExploder(100, 160, "black hole", "dark blue");
+  mainLandscape.setupPortal(20, 120, "portal1", "light blue", "horizontal");
+  mainLandscape.setupPortal(100, 60, "portal2", "light blue", "vertical");
+  mainLandscape.setupPortal(90, 10, "portal3", "light blue", "horizontal");
+  mainLandscape.setupPortal(10, 10, "portal4", "light blue", "vertical");
+  mainLandscape.setupPortal(60, 90, "portal5", "light blue", "horizontal");
 
-  // ___ MAIN WORLD ___
-  health = new GameOfLife(rows, cols, 0.6 * populationDensity, "health", "yellow", maxAge);
-  health.setup();
-  damage = new GameOfLife(rows, cols, 0.8 * populationDensity, "damage", "red", maxAge);
-  damage.setup();
-  gliderGun = new GameOfLife(rows, cols, 0, "damage", "red");
-  gliderGun.setupGilderGun(rows / 5, cols / 5);
-  blackHole = new GameOfLife(rows, cols, 0, "black hole", "dark blue");
-  blackHole.setupExploder(cols - cols / 5, rows - rows / 6);
-  portal1 = new GameOfLife(rows, cols, 0, "portal", "light blue");
-  portal1.setupPortal(cols / 6, rows - rows / 3, "horizontal");
-  portal2 = new GameOfLife(rows, cols, 0, "portal", "light blue");
-  portal2.setupPortal(cols - cols / 6, rows / 3, "vertical");
-  portal3 = new GameOfLife(rows, cols, 0, "portal", "light blue");
-  portal3.setupPortal(90, 10, "horizontal");
-  portal4 = new GameOfLife(rows, cols, 0, "portal", "light blue");
-  portal4.setupPortal(10, 10, "vertical");
-  portal5 = new GameOfLife(rows, cols, 0, "portal", "light blue");
-  portal5.setupPortal(60, 90, "vertical");
+  mainWorld = [0, "full", ball, damage, mainLandscape];
 
-  mainWorld = [
-    0,
-    "limited",
-    ball,
-    health,
-    damage,
-    gliderGun,
-    portal1,
-    portal2,
-    portal3,
-    portal4,
-    portal5,
-    blackHole
-  ];
+  // WORLD1
+  damage1 = new GameOfLife(rows, cols);
+  damage1.setup("damage", "red", 1 * populationDensity);
+  landscape1 = new GameOfLife(rows, cols);
+  landscape1.setup("health", "green", 0.6 * populationDensity);
+  landscape1.setupPortal(20, 120, "portal1", "light blue", "horizontal");
+  item1 = new GameOfLife(rows, cols);
+  item1.setup("item", "pink", 0);
+  item1.setupBlinker(100, 10, "item", "pink");
 
-  //
-  // ___ WORLD1 ___
-  health1 = new GameOfLife(rows, cols, 0.6 * populationDensity, "health", "green", maxAge);
-  health1.setup();
-  damage1 = new GameOfLife(rows, cols, 1 * populationDensity, "damage", "red", maxAge);
-  damage1.setup();
-  item1 = new GameOfLife(rows, cols, 0, "item", "pink");
-  item1.setupBlinker(100, 10);
+  world1 = [1, "full", ball, damage1, landscape1, item1];
 
-  world1 = [1, "full", ball, health1, damage1, portal1, item1];
+  // WORLD2
+  damage2 = new GameOfLife(rows, cols);
+  damage2.setup("damage", "red", 1.1 * populationDensity);
+  landscape2 = new GameOfLife(rows, cols);
+  landscape2.setup("health", "green", 0.7 * populationDensity);
+  landscape2.setupPortal(100, 60, "portal2", "light blue", "vertical");
+  item2 = new GameOfLife(rows, cols);
+  item2.setup("item", "pink", 0);
+  item2.setupBeacon(20, 120, "item", "pink");
 
-  //
-  // ___ WORLD2 ___
-  health2 = new GameOfLife(rows, cols, 0.9 * populationDensity, "health", "green", maxAge);
-  health2.setup();
-  damage2 = new GameOfLife(rows, cols, 1.1 * populationDensity, "damage", "red", maxAge);
-  damage2.setup();
-  item2 = new GameOfLife(rows, cols, 0, "item", "pink");
-  item2.setupBeacon(20, 120);
+  world2 = [2, "full", ball, damage2, landscape2, item2];
 
-  world2 = [2, "full", ball, health2, damage2, portal2, item2];
+  // WORLD3
+  damage3 = new GameOfLife(rows, cols);
+  damage3.setup("damage", "red", 1.1 * populationDensity);
+  landscape3 = new GameOfLife(rows, cols);
+  landscape3.setup("health", "green", 0.9 * populationDensity);
+  landscape3.setupPortal(90, 10, "portal3", "light blue", "horizontal");
+  item3 = new GameOfLife(rows, cols);
+  item3.setup("item", "pink", 0);
+  item3.setupToad(90, 170, "item", "pink");
 
-  //
-  // ___ WORLD3 ___
-  health3 = new GameOfLife(rows, cols, 0.9 * populationDensity, "health", "dark blue", maxAge);
-  health3.setup();
-  damage3 = new GameOfLife(rows, cols, 1.1 * populationDensity, "damage", "red", maxAge);
-  damage3.setup();
-  item3 = new GameOfLife(rows, cols, 0, "item", "pink");
-  item3.setupToad(90, 170);
+  world3 = [3, "full", ball, damage3, landscape3, item3];
 
-  world3 = [3, "full", ball, health3, damage3, portal3, item3];
+  // WORLD4
+  damage4 = new GameOfLife(rows, cols);
+  damage4.setup("damage", "red", 1.1 * populationDensity);
+  landscape4 = new GameOfLife(rows, cols);
+  landscape4.setup("health", "green", 0.9 * populationDensity);
+  landscape4.setupPortal(90, 10, "portal4", "light blue", "horizontal");
+  item4 = new GameOfLife(rows, cols);
+  item4.setup("item", "pink", 0);
+  item4.setupClock(90, 170, "item", "pink");
 
-  //
-  // ___ WORLD4 ___
-  health4 = new GameOfLife(rows, cols, 0.9 * populationDensity, "health", "dark blue", maxAge);
-  health4.setup();
-  damage4 = new GameOfLife(rows, cols, 1.1 * populationDensity, "damage", "red", maxAge);
-  damage4.setup();
-  item4 = new GameOfLife(rows, cols, 0, "item", "pink");
-  item4.setupClock(90, 170);
+  world4 = [4, "full", ball, damage4, landscape4, item4];
 
-  world4 = [4, "full", ball, health4, damage4, portal4, item4];
+  // WORLD5
+  damage5 = new GameOfLife(rows, cols);
+  damage5.setup("damage", "red", 1.1 * populationDensity);
+  landscape5 = new GameOfLife(rows, cols);
+  landscape5.setup("health", "green", 0.9 * populationDensity);
+  landscape5.setupPortal(90, 10, "portal5", "light blue", "horizontal");
+  item5 = new GameOfLife(rows, cols);
+  item5.setup("item", "pink", 0);
+  item5.setupBipole(10, 10, "item", "pink");
 
-  //
-  // ___ WORLD5 ___
-  health5 = new GameOfLife(rows, cols, 0.9 * populationDensity, "health", "dark blue", maxAge);
-  health5.setup();
-  damage5 = new GameOfLife(rows, cols, 1.1 * populationDensity, "damage", "red", maxAge);
-  damage5.setup();
-  item5 = new GameOfLife(rows, cols, 0, "item", "pink");
-  item5.setupBipole(10, 10);
-
-  world5 = [5, "full", ball, health5, damage5, portal5, item5];
+  world5 = [5, "full", ball, damage5, landscape5, item5];
 }
-//
-// --- GAME LOGIC AND DRAWING ---
-// ___ MAIN WORLD ___
 
+/**************************** 
+  --- UPDATE & DRAWING ---
+****************************/
 function updateEverything(world) {
   // update ball
   world[2].update();
@@ -243,15 +254,13 @@ function updateEverything(world) {
     world[i].update();
 
     // do collision check
-    if (checkCollision(world[2], world[i]) && world[i].type === "health") {
-      // console.log("checkCollision called HEALTH");
-      if (gainHealth(ball, radius)) {
-        ball.radius *= 1.1;
-        ball.speed *= 1.1;
-      }
-    }
-    if (checkCollision(world[2], world[i]) && world[i].type === "damage") {
+    if (
+      checkCollision(world[2], world[i])[0] &&
+      checkCollision(world[2], world[i])[1].includes("damage") &&
+      !justHitDamage
+    ) {
       // console.log("checkCollision called DAMAGE");
+      justHitDamage = true;
       if (!gameOver(ball, radius)) {
         ball.radius *= 0.9;
         ball.speed *= 0.9;
@@ -260,21 +269,48 @@ function updateEverything(world) {
         ball.speed = 0;
         stop();
       }
+      setTimeout(() => (justHitDamage = false), 100);
     }
-    if (checkCollision(world[2], world[i]) && world[i].type === "black hole" && !justHitBlackHole) {
+
+    if (
+      checkCollision(world[2], world[i])[0] &&
+      checkCollision(world[2], world[i])[1].includes("health") &&
+      !justHitHealth
+    ) {
+      // console.log("checkCollision called HEALTH");
+      justHitHealth = true;
+      if (gainHealth(ball, radius)) {
+        ball.radius *= 1.1;
+        ball.speed *= 1.1;
+      }
+      setTimeout(() => (justHitHealth = false), 2000);
+    }
+    if (
+      checkCollision(world[2], world[i])[0] &&
+      checkCollision(world[2], world[i])[1].includes("black hole") &&
+      !justHitBlackHole
+    ) {
       // console.log("checkCollision called BLACK HOLE");
       justHitBlackHole = true;
       if (itemsCollected === 5) {
         ball.radius = 0;
         ball.speed = 0;
-        mainWorld.splice(2, mainWorld.length - 3);
+        mainWorld.splice(3, mainWorld.length - 3);
+        setTimeout(() => {
+          ball.radius = 30;
+          ball.x = 370;
+          ball.y = 570;
+        }, 1400);
       } else {
         ball.speed *= -0.2;
       }
-      setTimeout(() => (justHitBlackHole = false), 500);
+      setTimeout(() => (justHitBlackHole = false), 1000);
     }
-    if (checkCollision(world[2], world[i]) && world[i].type === "item") {
-      // console.log("checkCollision called ITEM");
+    if (
+      checkCollision(world[2], world[i])[0] &&
+      checkCollision(world[2], world[i])[1].includes("item")
+    ) {
+      console.log("checkCollision called ITEM");
       switch (world[i]) {
         case item1:
           document.querySelector(".item1").classList.add("collected");
@@ -296,39 +332,43 @@ function updateEverything(world) {
       world.pop();
       itemsCollected++;
     }
-    if (checkCollision(world[2], world[i]) && world[i].type === "portal" && !justHitPortal) {
-      // console.log("checkCollision called PORTAL");
+    if (
+      checkCollision(world[2], world[i])[0] &&
+      checkCollision(world[2], world[i])[1].includes("portal") &&
+      !justHitPortal
+    ) {
+      console.log("checkCollision called PORTAL");
       justHitPortal = true;
-      switch (world[i]) {
-        case portal1:
+      let portal = checkCollision(world[2], world[i])[1];
+      switch (portal) {
+        case "portal1":
           level = 1;
           document.querySelector("#black-hole").classList.toggle("highlighted");
           document.querySelector(".item1").classList.toggle("highlighted");
           break;
-          case portal2:
+        case "portal2":
           level = 2;
           document.querySelector("#black-hole").classList.toggle("highlighted");
           document.querySelector(".item2").classList.toggle("highlighted");
           break;
-          case portal3:
+        case "portal3":
           level = 3;
           document.querySelector("#black-hole").classList.toggle("highlighted");
           document.querySelector(".item3").classList.toggle("highlighted");
           break;
-          case portal4:
+        case "portal4":
           level = 4;
           document.querySelector("#black-hole").classList.toggle("highlighted");
           document.querySelector(".item4").classList.toggle("highlighted");
           break;
-          case portal5:
+        case "portal5":
           document.querySelector("#black-hole").classList.toggle("highlighted");
           document.querySelector(".item5").classList.toggle("highlighted");
           level = 5;
           break;
       }
-      // stop();
       if (world !== mainWorld) level = 0;
-      intervalId = setInterval(animation, 1000 / 60);
+      intervalId = setInterval(animation, frameRate);
       setTimeout(() => (justHitPortal = false), 2000);
     }
   }
@@ -391,20 +431,18 @@ function stop() {
 }
 
 function updateModels() {
-  // update models
   for (let i = 0; i < models.length; i++) {
     models[i].update();
   }
 }
 function drawModels() {
-  // draw models
   ctxBlackHole.clearRect(0, 0, modelWidth, modelHeight);
   ctxBlackHole.fillStyle = "rgb(0, 0, 0)";
   ctxBlackHole.fillRect(0, 0, modelWidth, modelHeight);
   ctxPortal.clearRect(0, 0, modelWidth, modelHeight);
   ctxPortal.fillStyle = "rgb(0, 0, 0)";
   ctxPortal.fillRect(0, 0, modelWidth, modelHeight);
-  //
+
   ctxItem1.clearRect(0, 0, modelWidth, modelHeight);
   ctxItem1.fillStyle = "rgb(0, 0, 0)";
   ctxItem1.fillRect(0, 0, modelWidth, modelHeight);
@@ -434,19 +472,20 @@ function animateModels() {
   drawModels();
 }
 
-//
-// --- USER INTERFACE ---
+/**************************** 
+  --- USER INTERFACE ---
+****************************/
 window.onload = function() {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "rgb(0, 0, 0)";
   ctx.fillRect(0, 0, width, height);
   initModels();
-  setInterval(animateModels, 100);
+  setInterval(animateModels, frameRate);
+  initNewGame();
 
   document.querySelector(".btn-start").onclick = function() {
     // console.log("START");
-    newGame();
-    intervalId = setInterval(animation, 100);
+    intervalId = setInterval(animation, frameRate);
   };
   document.querySelector(".btn-stop").onclick = function() {
     // console.log("STOP");
@@ -455,18 +494,17 @@ window.onload = function() {
   document.querySelector(".btn-restart").onclick = function() {
     // console.log("RESTART");
     level = 0;
-    newGame();
-    intervalId = setInterval(animation, 100);
+    initNewGame();
+    intervalId = setInterval(animation, frameRate);
   };
 
   // listen for key events
   document.onkeydown = function(e) {
-    e.preventDefault(); // stop default behaviour (scrolling)
+    // e.preventDefault(); // stop default behaviour (scrolling)
     // console.log(e.keyCode);
     switch (e.keyCode) {
       case 13: // enter
-        newGame();
-        intervalId = setInterval(animation, 100);
+        intervalId = setInterval(animation, frameRate);
         break;
       case 38: // up
         ball.speed += 1;
