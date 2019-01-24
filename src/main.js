@@ -1,5 +1,5 @@
 // --- TO DO/IDEAS ---
-//  - add game controls
+//  - add loading information
 //  - add explanation
 //  - add music
 //  - add color gradient
@@ -58,7 +58,7 @@ let cols = 120;
 let rows = cols / ratio;
 
 let resolution = width / cols; // size of one cell ==> 6.66
-let radius = 1.5 * resolution; // ==> 10
+const radius = 1.5 * resolution; // ==> 10
 const MAX_RADIUS = 25;
 const MAX_SPEED = 20;
 let justAccelerated = false;
@@ -69,18 +69,21 @@ const MAX_AGE = false;
 // ANIMATION PROPERTIES
 let static = false;
 
-let setIntervalUsed = false;
+let setIntervalUsed = true;
+let setIntervalUsedModels = true;
 let intervalId;
 let frameRate = 100;
-let requestAnimationFrameUsed = true;
+let requestAnimationFrameUsed = false;
+let requestAnimationFrameUsedModels = false;
 let requestId;
 
-let level = 0;
-let justHitDamage = false;
-let justHitHealth = false;
-let justHitPortal = false;
-let justHitBlackHole = false;
-let itemsCollected = 0;
+let justHitDamage;
+let justHitHealth;
+let justHitPortal;
+let justHitBlackHole;
+let justGameOver;
+let level;
+let itemsCollected;
 
 let ball;
 
@@ -177,6 +180,14 @@ function initModels() {
 }
 
 function initNewGame() {
+  justHitDamage = false;
+  justHitHealth = false;
+  justHitPortal = false;
+  justHitBlackHole = false;
+  justGameOver = false;
+  level = 0;
+  itemsCollected = 0;
+
   ball = new Ball(300, 300, 0, radius);
   // MAIN WORLD
   damage = new GameOfLife(rows, cols, MAX_AGE);
@@ -516,10 +527,12 @@ function start() {
 }
 function stop() {
   if (setIntervalUsed) {
+    console.log("STOP setIntervall called");
     clearInterval(intervalId);
   }
   if (requestAnimationFrameUsed) {
     if (requestId) {
+      console.log("STOP requestAnimationFrame called");
       window.cancelAnimationFrame(requestId);
       requestId = undefined;
     }
@@ -527,21 +540,21 @@ function stop() {
 }
 
 function animateModels() {
-  if (setIntervalUsed) {
+  if (setIntervalUsedModels) {
     updateModels();
     drawModels();
   }
-  if (requestAnimationFrameUsed) {
+  if (requestAnimationFrameUsedModels) {
     updateModels();
     drawModels();
     startModels();
   }
 }
 function startModels() {
-  if (setIntervalUsed) {
+  if (setIntervalUsedModels) {
     setInterval(animateModels, frameRate);
   }
-  if (requestAnimationFrameUsed) {
+  if (requestAnimationFrameUsedModels) {
     window.requestAnimationFrame(animateModels);
   }
 }
@@ -549,6 +562,38 @@ function startModels() {
 /**************************** 
   --- USER INTERFACE ---
 ****************************/
+// PAGE ROUTING
+function displayPage(selectedPage) {
+  // Save all the tags with the attribute `data-page` in $pages
+  var $pages = document.querySelectorAll("[data-page]");
+  for (var i = 0; i < $pages.length; i++) {
+    // If the current page as the attribute data-page equals to the selectedPage
+    if ($pages[i].getAttribute("data-page") === selectedPage) {
+      $pages[i].style.display = ""; // display the current page
+    } else {
+      $pages[i].style.display = "none"; // hide the current page
+    }
+  }
+}
+
+function initRouting() {
+  // First, display only the page "home", the default page
+  displayPage("rules");
+
+  // Listen for click events on buttons (or any other elements) to change the page
+  var $buttons = document.querySelectorAll("[data-target]");
+  for (var i = 0; i < $buttons.length; i++) {
+    $buttons[i].onclick = function(e) {
+      e.preventDefault(); // stop the default behaviour (usefull for <a>)
+      var target = this.getAttribute("data-target");
+      displayPage(target);
+    };
+  }
+}
+
+initRouting();
+
+// USER INTERACTION
 window.onload = function() {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "rgb(0, 0, 0)";
@@ -558,42 +603,39 @@ window.onload = function() {
     startModels();
     initNewGame();
   }
+  document.querySelector("#pause-play").style.display = "none";
 
-  document.querySelector(".btn-start").onclick = function() {
+  document.querySelector("#start-restart").onclick = function() {
     // console.log("START");
-    $body.requestFullscreen();
-    start();
+    if (this.innerHTML === "START") {
+      this.innerHTML = "RESTART";
+      document.querySelector("#pause-play").style.display = "inline";
+      // $body.requestFullscreen();
+      start();
+    } else if (this.innerHTML === "RESTART") {
+      document.querySelector("#pause-play").innerHTML = "PAUSE";
+      restart();
+      start();
+    }
   };
-  document.querySelector(".btn-stop").onclick = function() {
+  document.querySelector("#pause-play").onclick = function() {
     // console.log("STOP");
-    stop();
-  };
-  document.querySelector(".btn-restart").onclick = function() {
-    // console.log("RESTART");
-    level = 0;
-    initNewGame();
-    // document.querySelector("#black-hole").classList.toggle("highlighted");
-    document.querySelector("#black-hole").classList.add("highlighted");
-    document.querySelector(".item1").classList.remove("highlighted");
-    document.querySelector(".item2").classList.remove("highlighted");
-    document.querySelector(".item3").classList.remove("highlighted");
-    document.querySelector(".item4").classList.remove("highlighted");
-    document.querySelector(".item5").classList.remove("highlighted");
-    document.querySelector(".item1").classList.remove("collected");
-    document.querySelector(".item2").classList.remove("collected");
-    document.querySelector(".item3").classList.remove("collected");
-    document.querySelector(".item4").classList.remove("collected");
-    document.querySelector(".item5").classList.remove("collected");
-    start();
+    if (this.innerHTML === "PAUSE") {
+      this.innerHTML = "PLAY";
+      stop();
+    } else if (this.innerHTML === "PLAY") {
+      this.innerHTML = "PAUSE";
+      start();
+    }
   };
 
   // listen for key events
   document.onkeydown = function(e) {
-    // e.preventDefault(); // stop default behaviour (scrolling)
+    e.preventDefault(); // stop default behaviour (scrolling)
     // console.log(e.keyCode);
     switch (e.keyCode) {
       case 13: // enter
-        start();
+        // start();
         break;
       case 38: // up
         if (gainSpeed(ball) && !justAccelerated) {

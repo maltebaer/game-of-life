@@ -15,43 +15,67 @@
     <title>Game of life</title>
   </head>
   <body>
-    <div class="content container d-flex justify-content-around">
-      <div class="item-container d-flex flex-column justify-content-center">
-        <h2>BLACK HOLE</h2>
-        <canvas id="black-hole" width="200" height="200" class="item highlighted"></canvas>
-        <h2>PORTAL</h2>
-        <canvas id="portal" width="200" height="200" class="item"></canvas>
-        <h2>ITEMS</h2>
-        <canvas id="item1" width="100" height="100" class="item item1"></canvas>
-        <canvas id="item2" width="100" height="100" class="item item2"></canvas>
-        <canvas id="item3" width="100" height="100" class="item item3"></canvas>
-        <canvas id="item4" width="100" height="100" class="item item4"></canvas>
-        <canvas id="item5" width="100" height="100" class="item item5"></canvas>
+    <section data-page="rules">
+      <div
+        class="rules-container container d-flex flex-column justify-content-center align-items-center"
+      >
+        <h1>INTRODUCTION</h1>
+        <p>Easy, peasy!</p>
+        <button data-target="play" class="btn btn-outline-info">Play</button>
       </div>
-      <canvas id="main" width="800" height="1200"></canvas>
+    </section>
+    <section data-page="game-over">
+      <div
+        class="rules-container container d-flex flex-column justify-content-center align-items-center"
+      >
+        <h1>GAME OVER</h1>
+        <p>Easy, peasy!</p>
+        <button data-target="play" class="btn btn-outline-info">Play again!</button>
+      </div>
+    </section>
 
-      <div class="control d-flex flex-column justify-content-center">
-        <div class="instructions">
-          <h2>INSTRUCTIONS</h2>
-          <p>
-            Your goal is to get inside the black hole! But wait, in order to pass its event horizon,
-            you need to collect all items. Watch out for them, they might not be in this world...
-          </p>
-          <p>
-            Be careful on your way through this universe! There are different type of cells. Some
-            could hurt you, but some could give you strength.
-          </p>
-          <h2>CONTROL</h2>
-          <p>
-            Use arrow left and right for navigation and up or down for acceleration and
-            deceleration, respectively.
-          </p>
+    <section data-page="play">
+      <div class="content container d-flex justify-content-around">
+        <div class="item-container d-flex flex-column justify-content-center">
+          <h2>BLACK HOLE</h2>
+          <canvas id="black-hole" width="200" height="200" class="item highlighted"></canvas>
+          <h2>PORTAL</h2>
+          <canvas id="portal" width="200" height="200" class="item"></canvas>
+          <h2>ITEMS</h2>
+          <canvas id="item1" width="100" height="100" class="item item1"></canvas>
+          <canvas id="item2" width="100" height="100" class="item item2"></canvas>
+          <canvas id="item3" width="100" height="100" class="item item3"></canvas>
+          <canvas id="item4" width="100" height="100" class="item item4"></canvas>
+          <canvas id="item5" width="100" height="100" class="item item5"></canvas>
         </div>
-        <button class="btn-start btn btn-outline-primary">START</button>
-        <button class="btn-stop btn btn-outline-primary">PAUSE</button>
-        <button class="btn-restart btn btn-outline-primary">RESTART</button>
+
+        <canvas id="main" width="800" height="1200"></canvas>
+
+        <div class="control d-flex flex-column justify-content-center">
+          <div class="instructions">
+            <h2>INSTRUCTIONS</h2>
+            <p>
+              Your goal is to get inside the black hole! But wait, in order to pass its event
+              horizon, you need to collect all items. Watch out for them, they might not be in this
+              world...
+            </p>
+            <p>
+              Be careful on your way through this universe! There are different type of cells. Some
+              could hurt you, but some could give you strength.
+            </p>
+            <h2>CONTROL</h2>
+            <p>
+              Use arrow left and right for navigation and up or down for acceleration and
+              deceleration, respectively.
+            </p>
+          </div>
+          <button data-target="rules" class="btn btn-outline-info">Rules</button>
+          <button id="start-restart" class="btn-start btn btn-outline-primary">START</button>
+          <button id="pause-play" class="btn-pause btn btn-outline-primary">PAUSE</button>
+          <!-- <button class="btn-restart btn btn-outline-primary">RESTART</button> -->
+        </div>
       </div>
-    </div>
+    </section>
 
     <!-- scripts and stuff -->
     <!-- <script

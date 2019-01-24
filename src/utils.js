@@ -59,6 +59,7 @@ function checkCollision(object, game) {
 
   if (
     type.includes("damage") ||
+    type.includes("health") ||
     type.includes("portal") ||
     type.includes("black hole") ||
     type.includes("item")
@@ -73,21 +74,47 @@ function checkCollision(object, game) {
         }
       }
     }
-  } else if (type.includes("health")) {
-    collision = game.grid[y][x].state === 1;
   }
+  // else if (type.includes("health")) {
+  //   collision = game.grid[y][x].state === 1;
+  // }
   return [collision, type];
 }
 
 function gameOver(object) {
-  if (object.radius < (2 * MAX_RADIUS) / 15) {
+  if (object.radius < (2 * MAX_RADIUS) / 15 && !justGameOver) {
+    justGameOver = true;
     ball.radius = 0;
     ball.speed = 0;
+    stop();
+    // initNewGame();
+    setTimeout(() => {
+      displayPage("game-over");
+      restart();
+    }, 500);
+    // setTimeout(() => (ball.radius = 10), 1400);
+    // setTimeout(() => (justGameOver = false), 20000);
     return true;
   } else {
     return false;
   }
 }
+function restart() {
+  document.querySelector("#pause-play").innerHTML = "PAUSE";
+  initNewGame();
+  document.querySelector("#black-hole").classList.add("highlighted");
+  document.querySelector(".item1").classList.remove("highlighted");
+  document.querySelector(".item2").classList.remove("highlighted");
+  document.querySelector(".item3").classList.remove("highlighted");
+  document.querySelector(".item4").classList.remove("highlighted");
+  document.querySelector(".item5").classList.remove("highlighted");
+  document.querySelector(".item1").classList.remove("collected");
+  document.querySelector(".item2").classList.remove("collected");
+  document.querySelector(".item3").classList.remove("collected");
+  document.querySelector(".item4").classList.remove("collected");
+  document.querySelector(".item5").classList.remove("collected");
+}
+
 function gainHealth(object) {
   if (object.radius < MAX_RADIUS) {
     return true;
