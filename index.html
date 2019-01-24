@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet" />
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
@@ -16,8 +17,11 @@
   <body>
     <div class="content container d-flex justify-content-around">
       <div class="item-container d-flex flex-column justify-content-center">
+        <h2>BLACK HOLE</h2>
         <canvas id="black-hole" width="200" height="200" class="item highlighted"></canvas>
+        <h2>PORTAL</h2>
         <canvas id="portal" width="200" height="200" class="item"></canvas>
+        <h2>ITEMS</h2>
         <canvas id="item1" width="100" height="100" class="item item1"></canvas>
         <canvas id="item2" width="100" height="100" class="item item2"></canvas>
         <canvas id="item3" width="100" height="100" class="item item3"></canvas>
@@ -27,6 +31,22 @@
       <canvas id="main" width="800" height="1200"></canvas>
 
       <div class="control d-flex flex-column justify-content-center">
+        <div class="instructions">
+          <h2>INSTRUCTIONS</h2>
+          <p>
+            Your goal is to get inside the black hole! But wait, in order to pass its event horizon,
+            you need to collect all items. Watch out for them, they might not be in this world...
+          </p>
+          <p>
+            Be careful on your way through this universe! There are different type of cells. Some
+            could hurt you, but some could give you strength.
+          </p>
+          <h2>CONTROL</h2>
+          <p>
+            Use arrow left and right for navigation and up or down for acceleration and
+            deceleration, respectively.
+          </p>
+        </div>
         <button class="btn-start btn btn-outline-primary">START</button>
         <button class="btn-stop btn btn-outline-primary">PAUSE</button>
         <button class="btn-restart btn btn-outline-primary">RESTART</button>

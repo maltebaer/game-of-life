@@ -74,7 +74,5 @@ class Ball {
     this.angle += this.vAngle;
     this.y = (this.y + this.speed * Math.cos(this.angle) + height) % height;
     this.x = (this.x - this.speed * Math.sin(this.angle) + width) % width;
-    // this.y = (this.y + this.speed * Math.cos(this.angle) + 600) % 600;
-    // this.x = (this.x - this.speed * Math.sin(this.angle) + 600) % 600;
   }
 }

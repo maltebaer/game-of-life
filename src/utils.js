@@ -79,15 +79,33 @@ function checkCollision(object, game) {
   return [collision, type];
 }
 
-function gameOver(object, radius) {
-  if (object.radius < radius / 3) return true;
+function gameOver(object) {
+  if (object.radius < (2 * MAX_RADIUS) / 15) {
+    ball.radius = 0;
+    ball.speed = 0;
+    return true;
+  } else {
+    return false;
+  }
 }
-function gainHealth(object, radius) {
-  if (object.radius < 2.5 * radius) return true;
+function gainHealth(object) {
+  if (object.radius < MAX_RADIUS) {
+    return true;
+  } else {
+    return false;
+  }
+}
+function gainSpeed(object) {
+  if (Math.abs(object.speed) < MAX_SPEED) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-function cellColor(color, generationsDead = 0) {
+function cellColor(color, generationsDead = 0, i) {
   let alpha = 1 - generationsDead / 5;
+  let gradient = (10 * 180) / i;
   switch (color) {
     case "dark blue":
       return `rgba(51, 102, 255, ${alpha})`;
@@ -96,7 +114,7 @@ function cellColor(color, generationsDead = 0) {
     case "yellow":
       return `rgba(255, 255, 0, ${alpha})`;
     case "red":
-      return `rgba(255, 0, 0, ${alpha})`;
+      return `rgba(255, 20, 50, ${alpha})`;
     case "green":
       return `rgba(0, 255, 0, ${alpha})`;
     case "pink":

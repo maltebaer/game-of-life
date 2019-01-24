@@ -1,6 +1,5 @@
 // --- TO DO/IDEAS ---
 //  - add game controls
-//  - add max speed
 //  - add explanation
 //  - add music
 //  - add color gradient
@@ -40,6 +39,8 @@ let ctxItem4 = canvasItem4.getContext("2d");
 let canvasItem5 = document.querySelector("#item5");
 let ctxItem5 = canvasItem5.getContext("2d");
 
+let $body = document.querySelector("body");
+
 // let modelWidth = canvasPortal.width;
 // let modelHeight = canvasPortal.height;
 let modelWidth = 200;
@@ -58,18 +59,28 @@ let rows = cols / ratio;
 
 let resolution = width / cols; // size of one cell ==> 6.66
 let radius = 1.5 * resolution; // ==> 10
+const MAX_RADIUS = 25;
+const MAX_SPEED = 20;
+let justAccelerated = false;
 
 let populationDensity = 0.07;
-let maxAge = false;
+const MAX_AGE = false;
 
+// ANIMATION PROPERTIES
+let static = false;
+
+let setIntervalUsed = false;
 let intervalId;
+let frameRate = 100;
+let requestAnimationFrameUsed = true;
+let requestId;
+
 let level = 0;
 let justHitDamage = false;
 let justHitHealth = false;
 let justHitPortal = false;
 let justHitBlackHole = false;
 let itemsCollected = 0;
-let frameRate = 1000 / 60;
 
 let ball;
 
@@ -168,9 +179,9 @@ function initModels() {
 function initNewGame() {
   ball = new Ball(300, 300, 0, radius);
   // MAIN WORLD
-  damage = new GameOfLife(rows, cols, maxAge);
+  damage = new GameOfLife(rows, cols, MAX_AGE);
   damage.setup("damage", "red", 0.8 * populationDensity);
-  mainLandscape = new GameOfLife(rows, cols, maxAge);
+  mainLandscape = new GameOfLife(rows, cols, MAX_AGE);
   mainLandscape.setup("health", "yellow", 1.2 * populationDensity);
   mainLandscape.setupExploder(100, 160, "black hole", "dark blue");
   mainLandscape.setupPortal(20, 120, "portal1", "light blue", "horizontal");
@@ -179,13 +190,13 @@ function initNewGame() {
   mainLandscape.setupPortal(10, 10, "portal4", "light blue", "vertical");
   mainLandscape.setupPortal(60, 90, "portal5", "light blue", "horizontal");
 
-  mainWorld = [0, "full", ball, damage, mainLandscape];
+  mainWorld = [0, "limited", ball, damage, mainLandscape];
 
   // WORLD1
   damage1 = new GameOfLife(rows, cols);
   damage1.setup("damage", "red", 1 * populationDensity);
   landscape1 = new GameOfLife(rows, cols);
-  landscape1.setup("health", "green", 0.6 * populationDensity);
+  landscape1.setup("health", "yellow", 0.6 * populationDensity);
   landscape1.setupPortal(20, 120, "portal1", "light blue", "horizontal");
   item1 = new GameOfLife(rows, cols);
   item1.setup("item", "pink", 0);
@@ -197,7 +208,7 @@ function initNewGame() {
   damage2 = new GameOfLife(rows, cols);
   damage2.setup("damage", "red", 1.1 * populationDensity);
   landscape2 = new GameOfLife(rows, cols);
-  landscape2.setup("health", "green", 0.7 * populationDensity);
+  landscape2.setup("health", "yellow", 0.7 * populationDensity);
   landscape2.setupPortal(100, 60, "portal2", "light blue", "vertical");
   item2 = new GameOfLife(rows, cols);
   item2.setup("item", "pink", 0);
@@ -209,11 +220,11 @@ function initNewGame() {
   damage3 = new GameOfLife(rows, cols);
   damage3.setup("damage", "red", 1.1 * populationDensity);
   landscape3 = new GameOfLife(rows, cols);
-  landscape3.setup("health", "green", 0.9 * populationDensity);
+  landscape3.setup("health", "yellow", 0.9 * populationDensity);
   landscape3.setupPortal(90, 10, "portal3", "light blue", "horizontal");
   item3 = new GameOfLife(rows, cols);
   item3.setup("item", "pink", 0);
-  item3.setupToad(90, 170, "item", "pink");
+  item3.setupToad(30, 170, "item", "pink");
 
   world3 = [3, "full", ball, damage3, landscape3, item3];
 
@@ -221,8 +232,8 @@ function initNewGame() {
   damage4 = new GameOfLife(rows, cols);
   damage4.setup("damage", "red", 1.1 * populationDensity);
   landscape4 = new GameOfLife(rows, cols);
-  landscape4.setup("health", "green", 0.9 * populationDensity);
-  landscape4.setupPortal(90, 10, "portal4", "light blue", "horizontal");
+  landscape4.setup("health", "yellow", 0.9 * populationDensity);
+  landscape4.setupPortal(10, 10, "portal4", "light blue", "vertical");
   item4 = new GameOfLife(rows, cols);
   item4.setup("item", "pink", 0);
   item4.setupClock(90, 170, "item", "pink");
@@ -233,8 +244,8 @@ function initNewGame() {
   damage5 = new GameOfLife(rows, cols);
   damage5.setup("damage", "red", 1.1 * populationDensity);
   landscape5 = new GameOfLife(rows, cols);
-  landscape5.setup("health", "green", 0.9 * populationDensity);
-  landscape5.setupPortal(90, 10, "portal5", "light blue", "horizontal");
+  landscape5.setup("health", "yellow", 0.9 * populationDensity);
+  landscape5.setupPortal(60, 90, "portal5", "light blue", "horizontal");
   item5 = new GameOfLife(rows, cols);
   item5.setup("item", "pink", 0);
   item5.setupBipole(10, 10, "item", "pink");
@@ -247,133 +258,129 @@ function initNewGame() {
 ****************************/
 function updateEverything(world) {
   // update ball
-  world[2].update();
+  if (!gameOver(ball)) {
+    world[2].update();
 
-  // update rest
-  for (let i = 3; i < world.length; i++) {
-    world[i].update();
+    // update everything else
+    for (let i = 3; i < world.length; i++) {
+      world[i].update();
 
-    // do collision check
-    if (
-      checkCollision(world[2], world[i])[0] &&
-      checkCollision(world[2], world[i])[1].includes("damage") &&
-      !justHitDamage
-    ) {
-      // console.log("checkCollision called DAMAGE");
-      justHitDamage = true;
-      if (!gameOver(ball, radius)) {
-        ball.radius *= 0.9;
-        ball.speed *= 0.9;
-      } else {
-        ball.radius = 0;
-        ball.speed = 0;
-        stop();
+      // do collision check
+      if (
+        checkCollision(world[2], world[i])[0] &&
+        checkCollision(world[2], world[i])[1].includes("damage") &&
+        !justHitDamage
+      ) {
+        // console.log("checkCollision called DAMAGE");
+        justHitDamage = true;
+        if (!gameOver(ball)) {
+          ball.radius *= 0.9;
+          ball.speed *= 0.9;
+        }
+        setTimeout(() => (justHitDamage = false), 100);
       }
-      setTimeout(() => (justHitDamage = false), 100);
-    }
 
-    if (
-      checkCollision(world[2], world[i])[0] &&
-      checkCollision(world[2], world[i])[1].includes("health") &&
-      !justHitHealth
-    ) {
-      // console.log("checkCollision called HEALTH");
-      justHitHealth = true;
-      if (gainHealth(ball, radius)) {
-        ball.radius *= 1.1;
-        ball.speed *= 1.1;
+      if (
+        checkCollision(world[2], world[i])[0] &&
+        checkCollision(world[2], world[i])[1].includes("health") &&
+        !justHitHealth
+      ) {
+        // console.log("checkCollision called HEALTH");
+        justHitHealth = true;
+        if (gainHealth(ball, radius) && gainSpeed(ball)) {
+          ball.radius *= 1.1;
+          ball.speed *= 1.1;
+        }
+        setTimeout(() => (justHitHealth = false), 2000);
+      } else if (
+        checkCollision(world[2], world[i])[0] &&
+        checkCollision(world[2], world[i])[1].includes("portal") &&
+        !justHitPortal
+      ) {
+        // console.log("checkCollision called PORTAL");
+        justHitPortal = true;
+        let portal = checkCollision(world[2], world[i])[1];
+        switch (portal) {
+          case "portal1":
+            level = 1;
+            document.querySelector("#black-hole").classList.toggle("highlighted");
+            document.querySelector(".item1").classList.toggle("highlighted");
+            break;
+          case "portal2":
+            level = 2;
+            document.querySelector("#black-hole").classList.toggle("highlighted");
+            document.querySelector(".item2").classList.toggle("highlighted");
+            break;
+          case "portal3":
+            level = 3;
+            document.querySelector("#black-hole").classList.toggle("highlighted");
+            document.querySelector(".item3").classList.toggle("highlighted");
+            break;
+          case "portal4":
+            level = 4;
+            document.querySelector("#black-hole").classList.toggle("highlighted");
+            document.querySelector(".item4").classList.toggle("highlighted");
+            break;
+          case "portal5":
+            document.querySelector("#black-hole").classList.toggle("highlighted");
+            document.querySelector(".item5").classList.toggle("highlighted");
+            level = 5;
+            break;
+        }
+        if (world !== mainWorld) level = 0;
+        start();
+        setTimeout(() => (justHitPortal = false), 2000);
+      } else if (
+        checkCollision(world[2], world[i])[0] &&
+        checkCollision(world[2], world[i])[1].includes("black hole") &&
+        !justHitBlackHole
+      ) {
+        // console.log("checkCollision called BLACK HOLE");
+        justHitBlackHole = true;
+        if (itemsCollected === 0) {
+          ball.radius = 0;
+          ball.speed = 0;
+          mainWorld.splice(3, mainWorld.length - 3);
+          setTimeout(() => {
+            ball.radius = 50;
+            ball.x = 370;
+            ball.y = 570;
+          }, 1400);
+        } else {
+          ball.speed *= -0.2;
+        }
+        setTimeout(() => (justHitBlackHole = false), 500);
+      } else if (
+        checkCollision(world[2], world[i])[0] &&
+        checkCollision(world[2], world[i])[1].includes("item")
+      ) {
+        // console.log("checkCollision called ITEM");
+        switch (world[i]) {
+          case item1:
+            document.querySelector(".item1").classList.add("collected");
+            break;
+          case item2:
+            document.querySelector(".item2").classList.add("collected");
+            break;
+          case item3:
+            document.querySelector(".item3").classList.add("collected");
+            break;
+          case item4:
+            document.querySelector(".item4").classList.add("collected");
+            break;
+          case item5:
+            document.querySelector(".item5").classList.add("collected");
+            break;
+        }
+        ball.speed *= -1;
+        world.pop();
+        itemsCollected++;
       }
-      setTimeout(() => (justHitHealth = false), 2000);
     }
-    if (
-      checkCollision(world[2], world[i])[0] &&
-      checkCollision(world[2], world[i])[1].includes("black hole") &&
-      !justHitBlackHole
-    ) {
-      // console.log("checkCollision called BLACK HOLE");
-      justHitBlackHole = true;
-      if (itemsCollected === 5) {
-        ball.radius = 0;
-        ball.speed = 0;
-        mainWorld.splice(3, mainWorld.length - 3);
-        setTimeout(() => {
-          ball.radius = 30;
-          ball.x = 370;
-          ball.y = 570;
-        }, 1400);
-      } else {
-        ball.speed *= -0.2;
-      }
-      setTimeout(() => (justHitBlackHole = false), 1000);
-    }
-    if (
-      checkCollision(world[2], world[i])[0] &&
-      checkCollision(world[2], world[i])[1].includes("item")
-    ) {
-      console.log("checkCollision called ITEM");
-      switch (world[i]) {
-        case item1:
-          document.querySelector(".item1").classList.add("collected");
-          break;
-        case item2:
-          document.querySelector(".item2").classList.add("collected");
-          break;
-        case item3:
-          document.querySelector(".item3").classList.add("collected");
-          break;
-        case item4:
-          document.querySelector(".item4").classList.add("collected");
-          break;
-        case item5:
-          document.querySelector(".item5").classList.add("collected");
-          break;
-      }
-      ball.speed *= -1;
-      world.pop();
-      itemsCollected++;
-    }
-    if (
-      checkCollision(world[2], world[i])[0] &&
-      checkCollision(world[2], world[i])[1].includes("portal") &&
-      !justHitPortal
-    ) {
-      console.log("checkCollision called PORTAL");
-      justHitPortal = true;
-      let portal = checkCollision(world[2], world[i])[1];
-      switch (portal) {
-        case "portal1":
-          level = 1;
-          document.querySelector("#black-hole").classList.toggle("highlighted");
-          document.querySelector(".item1").classList.toggle("highlighted");
-          break;
-        case "portal2":
-          level = 2;
-          document.querySelector("#black-hole").classList.toggle("highlighted");
-          document.querySelector(".item2").classList.toggle("highlighted");
-          break;
-        case "portal3":
-          level = 3;
-          document.querySelector("#black-hole").classList.toggle("highlighted");
-          document.querySelector(".item3").classList.toggle("highlighted");
-          break;
-        case "portal4":
-          level = 4;
-          document.querySelector("#black-hole").classList.toggle("highlighted");
-          document.querySelector(".item4").classList.toggle("highlighted");
-          break;
-        case "portal5":
-          document.querySelector("#black-hole").classList.toggle("highlighted");
-          document.querySelector(".item5").classList.toggle("highlighted");
-          level = 5;
-          break;
-      }
-      if (world !== mainWorld) level = 0;
-      intervalId = setInterval(animation, frameRate);
-      setTimeout(() => (justHitPortal = false), 2000);
-    }
+  } else {
+    stop();
   }
 }
-
 function drawEverything(world) {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "rgb(0, 0, 0)";
@@ -394,40 +401,6 @@ function drawEverything(world) {
 
   // draw ball
   world[2].draw(ctx);
-}
-function animation() {
-  switch (level) {
-    case 0:
-      updateEverything(mainWorld);
-      drawEverything(mainWorld);
-      break;
-    case 1:
-      updateEverything(world1);
-      drawEverything(world1);
-      break;
-    case 2:
-      updateEverything(world2);
-      drawEverything(world2);
-      break;
-    case 3:
-      updateEverything(world3);
-      drawEverything(world3);
-      break;
-    case 4:
-      updateEverything(world4);
-      drawEverything(world4);
-      break;
-    case 5:
-      updateEverything(world5);
-      drawEverything(world5);
-      break;
-
-    default:
-      break;
-  }
-}
-function stop() {
-  clearInterval(intervalId);
 }
 
 function updateModels() {
@@ -467,9 +440,110 @@ function drawModels() {
   models[5].draw(ctxItem4);
   models[6].draw(ctxItem5);
 }
+
+/**************************** 
+  --- ANIMATION & STOP ---
+****************************/
+function animation() {
+  if (setIntervalUsed) {
+    switch (level) {
+      case 0:
+        updateEverything(mainWorld);
+        drawEverything(mainWorld);
+        break;
+      case 1:
+        updateEverything(world1);
+        drawEverything(world1);
+        break;
+      case 2:
+        updateEverything(world2);
+        drawEverything(world2);
+        break;
+      case 3:
+        updateEverything(world3);
+        drawEverything(world3);
+        break;
+      case 4:
+        updateEverything(world4);
+        drawEverything(world4);
+        break;
+      case 5:
+        updateEverything(world5);
+        drawEverything(world5);
+        break;
+    }
+  }
+  if (requestAnimationFrameUsed) {
+    requestId = undefined;
+    switch (level) {
+      case 0:
+        updateEverything(mainWorld);
+        drawEverything(mainWorld);
+        break;
+      case 1:
+        updateEverything(world1);
+        drawEverything(world1);
+        break;
+      case 2:
+        updateEverything(world2);
+        drawEverything(world2);
+        break;
+      case 3:
+        updateEverything(world3);
+        drawEverything(world3);
+        break;
+      case 4:
+        updateEverything(world4);
+        drawEverything(world4);
+        break;
+      case 5:
+        updateEverything(world5);
+        drawEverything(world5);
+        break;
+    }
+    start();
+  }
+}
+function start() {
+  if (setIntervalUsed) {
+    intervalId = setInterval(animation, frameRate);
+  }
+  if (requestAnimationFrameUsed) {
+    if (!requestId) {
+      requestId = window.requestAnimationFrame(animation);
+    }
+  }
+}
+function stop() {
+  if (setIntervalUsed) {
+    clearInterval(intervalId);
+  }
+  if (requestAnimationFrameUsed) {
+    if (requestId) {
+      window.cancelAnimationFrame(requestId);
+      requestId = undefined;
+    }
+  }
+}
+
 function animateModels() {
-  updateModels();
-  drawModels();
+  if (setIntervalUsed) {
+    updateModels();
+    drawModels();
+  }
+  if (requestAnimationFrameUsed) {
+    updateModels();
+    drawModels();
+    startModels();
+  }
+}
+function startModels() {
+  if (setIntervalUsed) {
+    setInterval(animateModels, frameRate);
+  }
+  if (requestAnimationFrameUsed) {
+    window.requestAnimationFrame(animateModels);
+  }
 }
 
 /**************************** 
@@ -479,13 +553,16 @@ window.onload = function() {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "rgb(0, 0, 0)";
   ctx.fillRect(0, 0, width, height);
-  initModels();
-  setInterval(animateModels, frameRate);
-  initNewGame();
+  if (!static) {
+    initModels();
+    startModels();
+    initNewGame();
+  }
 
   document.querySelector(".btn-start").onclick = function() {
     // console.log("START");
-    intervalId = setInterval(animation, frameRate);
+    $body.requestFullscreen();
+    start();
   };
   document.querySelector(".btn-stop").onclick = function() {
     // console.log("STOP");
@@ -495,7 +572,19 @@ window.onload = function() {
     // console.log("RESTART");
     level = 0;
     initNewGame();
-    intervalId = setInterval(animation, frameRate);
+    // document.querySelector("#black-hole").classList.toggle("highlighted");
+    document.querySelector("#black-hole").classList.add("highlighted");
+    document.querySelector(".item1").classList.remove("highlighted");
+    document.querySelector(".item2").classList.remove("highlighted");
+    document.querySelector(".item3").classList.remove("highlighted");
+    document.querySelector(".item4").classList.remove("highlighted");
+    document.querySelector(".item5").classList.remove("highlighted");
+    document.querySelector(".item1").classList.remove("collected");
+    document.querySelector(".item2").classList.remove("collected");
+    document.querySelector(".item3").classList.remove("collected");
+    document.querySelector(".item4").classList.remove("collected");
+    document.querySelector(".item5").classList.remove("collected");
+    start();
   };
 
   // listen for key events
@@ -504,13 +593,19 @@ window.onload = function() {
     // console.log(e.keyCode);
     switch (e.keyCode) {
       case 13: // enter
-        intervalId = setInterval(animation, frameRate);
+        start();
         break;
       case 38: // up
-        ball.speed += 1;
+        if (gainSpeed(ball) && !justAccelerated) {
+          justAccelerated = true;
+          ball.speed += 1;
+        }
         break;
       case 40: // down
-        ball.speed -= 1;
+        if (gainSpeed(ball) && !justAccelerated) {
+          justAccelerated = true;
+          ball.speed -= 1;
+        }
         break;
       case 37: // left
         ball.vAngle = -0.07;
@@ -522,6 +617,10 @@ window.onload = function() {
   };
   document.onkeyup = function(e) {
     switch (e.keyCode) {
+      case 38: // left
+      case 40: // right
+        justAccelerated = false;
+        break;
       case 37: // left
       case 39: // right
         ball.vAngle = 0;

@@ -468,7 +468,7 @@ class GameOfLife {
         let y = i * resolution;
         let x = j * resolution;
         if (this.grid[i][j].state === 1) {
-          ctx.fillStyle = cellColor(this.grid[i][j].color);
+          ctx.fillStyle = cellColor(this.grid[i][j].color, 0, i);
           ctx.fillRect(x, y, resolution, resolution);
         }
         if (this.grid[i][j].state === 0 && this.grid[i][j].generationsDead === 1) {
