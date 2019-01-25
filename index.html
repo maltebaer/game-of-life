@@ -21,25 +21,30 @@
       >
         <h1>THE GAME OF LIFE</h1>
         <p>
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-          invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
-          accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
-          sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing
-          elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed
-          diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd
-          gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit
-          amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-          dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
-          et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
-          amet.
+          Welcome to the game of life! This game is based on John Horton Conway's famous
+          <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">cellular automaton</a>,
+          that he first published in 1970.
         </p>
         <p>
-          Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
-          nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in
-          vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at
-          vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit
-          augue duis dolore te feugait nulla facilisi.
+          Conway's game of life is a simulation of a two-dimensional grid of cells, where each cell
+          can have two states; either dead or alive. The simluation starts with an initial pattern, the so
+          called first generation. Each cell in the next generation evolves, depending on the
+          statuses of the cell's 8 neighbours, from applying three simple rules:
         </p>
+        <p>
+          // give birth <br>
+          if (cell.state === 0 && neighbours === 3) { <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;cellNextGeneration.state = 1; <br>
+          } <br>
+          <br>
+          // or let die <br>
+          else if ( <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;(cell.state === 1 && neighbours < 2) || <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;(cell.state === 1 && neighbours > 3)) { <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;cellNextGeneration.state = 0; <br>
+          } <br>
+        </p>
+        <p>In this game I have used Conway's game of life to simulate a universe with different cell types and patterns. The user, i.e. you, can control an object, that interacts with these cells. Some of the patterns are stable, some will change over time. You will need to find out, what types will affect you how.</p>
         <button data-target="play" class="btn btn-outline-info">Play</button>
       </div>
     </section>
@@ -88,8 +93,8 @@
           <div class="instructions">
             <h2>INSTRUCTIONS</h2>
             <p>
-              Your goal is to get inside the black hole! But wait, in order to pass its event
-              horizon, you need to collect all items. Watch out for them, they might not be in this
+              Your goal is to get inside the <span class="dark-blue">black hole</span>! But wait, in order to pass its event
+              horizon, you first need to collect all <span class="pink">items</span>. Watch out for them, they might not be in <span class="light-blue">this</span>
               world...
             </p>
             <p>
@@ -98,11 +103,11 @@
             </p>
             <h2>CONTROL</h2>
             <p>
-              Use arrow left and right for navigation and up or down for acceleration and
+              Use arrow <span class="chartreuse">left</span> and <span class="chartreuse">right</span> for navigation and <span class="chartreuse">up</span> or <span class="chartreuse">down</span> for acceleration and
               deceleration, respectively.
             </p>
           </div>
-          <button data-target="rules" class="btn btn-outline-info">Rules</button>
+          <button data-target="rules" class="btn btn-outline-info">HOME</button>
           <button id="start-restart" class="btn-start btn btn-outline-primary">START</button>
           <button id="pause-play" class="btn-pause btn btn-outline-primary">PAUSE</button>
           <!-- <button class="btn-restart btn btn-outline-primary">RESTART</button> -->

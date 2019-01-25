@@ -5,15 +5,23 @@ body {
   color: #ccc;
 }
 
+h1 {
+  border-bottom: 2px solid #17a2b8;
+}
 h2 {
   /* margin: 0; */
   font-size: 1.5em;
   text-align: center;
+  /* border-bottom: 1px solid #17a2b8; */
 }
 h3 {
   /* margin: 0; */
   font-size: 1.2em;
   text-align: center;
+}
+
+p {
+  font-size: 1.1em;
 }
 
 .rules-container {
@@ -49,6 +57,19 @@ canvas {
 
 .control button {
   margin: 10px;
+}
+
+span.dark-blue {
+  color: rgb(51, 102, 255);
+}
+span.light-blue {
+  color: rgb(153, 179, 255);
+}
+span.pink {
+  color: rgb(255, 102, 153);
+}
+span.chartreuse {
+  color: rgba(127, 255, 0, 0.9);
 }
 
 /* .box {
