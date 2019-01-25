@@ -71,6 +71,9 @@ span.pink {
 span.chartreuse {
   color: rgba(127, 255, 0, 0.9);
 }
+span.lila {
+  color: rgb(204, 51, 255);
+}
 
 /* .box {
   border: 1px solid red;

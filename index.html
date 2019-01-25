@@ -33,15 +33,15 @@
         </p>
         <p>
           // give birth <br>
-          if (cell.state === 0 && neighbours === 3) { <br>
-            &nbsp;&nbsp;&nbsp;&nbsp;cellNextGeneration.state = 1; <br>
+          <span class="lila">if</span> (<span class="light-blue">cell</span>. <span class="lila">state</span> === <span class="light-blue">0</span> && <span class="light-blue">neighbours</span> === <span class="light-blue">3</span>) { <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="light-blue">cellNextGeneration</span>. <span class="lila">state</span> = <span class="light-blue">1</span>; <br>
           } <br>
           <br>
           // or let die <br>
-          else if ( <br>
-            &nbsp;&nbsp;&nbsp;&nbsp;(cell.state === 1 && neighbours < 2) || <br>
-            &nbsp;&nbsp;&nbsp;&nbsp;(cell.state === 1 && neighbours > 3)) { <br>
-            &nbsp;&nbsp;&nbsp;&nbsp;cellNextGeneration.state = 0; <br>
+          <span class="lila">else if</span> ( <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;(<span class="light-blue">cell</span>.<span class="lila">state</span> === <span class="light-blue">1</span> && <span class="light-blue">neighbours</span> &lt; <span class="light-blue">2</span>) || <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;(<span class="light-blue">cell</span>.<span class="lila">state</span> === <span class="light-blue">1</span> && <span class="light-blue">neighbours</span> &gt; <span class="light-blue">3</span>)) { <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="light-blue">cellNextGeneration</span>.<span class="lila">state</span> = <span class="light-blue">0</span>; <br>
           } <br>
         </p>
         <p>In this game I have used Conway's game of life to simulate a universe with different cell types and patterns. The user, i.e. you, can control an object, that interacts with these cells. Some of the patterns are stable, some will change over time. You will need to find out, what types will affect you how.</p>
