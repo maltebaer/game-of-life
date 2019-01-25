@@ -1,7 +1,4 @@
 // --- TO DO/IDEAS ---
-//  - add loading information
-//  - update explanation
-//  - add favicon
 //  - add color gradient
 //  - improve worlds
 //  - add ball size to checkCollision
@@ -236,7 +233,7 @@ function initNewGame() {
   damage2 = new GameOfLife(rows, cols);
   damage2.setup("damage", "red", 1.1 * populationDensity);
   landscape2 = new GameOfLife(rows, cols);
-  landscape2.setup("health", "yellow", 0.7 * populationDensity);
+  landscape2.setup("health", "blue", 0.7 * populationDensity);
   landscape2.setupPortal(100, 60, "portal2", "light blue", "vertical");
   item2 = new GameOfLife(rows, cols);
   item2.setup("item", "pink", 0);
@@ -272,7 +269,7 @@ function initNewGame() {
   damage5 = new GameOfLife(rows, cols);
   damage5.setup("damage", "red", 1.1 * populationDensity);
   landscape5 = new GameOfLife(rows, cols);
-  landscape5.setup("health", "yellow", 0.9 * populationDensity);
+  landscape5.setup("health", "orange", 0.9 * populationDensity);
   landscape5.setupPortal(60, 90, "portal5", "light blue", "horizontal");
   item5 = new GameOfLife(rows, cols);
   item5.setup("item", "pink", 0);
