@@ -17,27 +17,56 @@
   <body>
     <section data-page="rules">
       <div
-        class="rules-container container d-flex flex-column justify-content-center align-items-center"
+        class="box rules-container container d-flex flex-column justify-content-center align-items-center"
       >
-        <h1>INTRODUCTION</h1>
-        <p>Easy, peasy!</p>
+        <h1>THE GAME OF LIFE</h1>
+        <p>
+          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+          invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
+          accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
+          sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing
+          elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed
+          diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd
+          gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit
+          amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+          dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
+          et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
+          amet.
+        </p>
+        <p>
+          Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+          nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in
+          vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at
+          vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit
+          augue duis dolore te feugait nulla facilisi.
+        </p>
         <button data-target="play" class="btn btn-outline-info">Play</button>
       </div>
     </section>
-    
+
     <section data-page="game-over">
       <div
         class="rules-container container d-flex flex-column justify-content-center align-items-center"
       >
         <h1>GAME OVER</h1>
-        <p>Easy, peasy!</p>
+        <p>Easy, peasy! Just wait a second, and ...</p>
+        <button data-target="play" class="btn btn-outline-info">Play again!</button>
+      </div>
+    </section>
+
+    <section data-page="game-win">
+      <div
+        class="rules-container container d-flex flex-column justify-content-center align-items-center"
+      >
+        <h1>YOU WIN</h1>
+        <p>Congratulations, that's it! Just wait a second, and ...</p>
         <button data-target="play" class="btn btn-outline-info">Play again!</button>
       </div>
     </section>
 
     <section data-page="play">
-      <div class="content container d-flex justify-content-around">
-        <div class="item-container d-flex flex-column justify-content-center">
+      <div class="box content container d-flex justify-content-around">
+        <div class="box item-container d-flex flex-column justify-content-center">
           <h2>BLACK HOLE</h2>
           <canvas id="black-hole" width="200" height="200" class="item highlighted"></canvas>
           <h2>PORTAL</h2>
@@ -50,9 +79,12 @@
           <canvas id="item5" width="100" height="100" class="item item5"></canvas>
         </div>
 
-        <canvas id="main" width="800" height="1200"></canvas>
+        <div>
+          <canvas id="main" width="800" height="1200" class="box"></canvas>
+          <h3>Music made with love by <a href="https://soundcloud.com/niju-1">Niju</a></h3>
+        </div>
 
-        <div class="control d-flex flex-column justify-content-center">
+        <div class="box control d-flex flex-column justify-content-center">
           <div class="instructions">
             <h2>INSTRUCTIONS</h2>
             <p>
@@ -99,10 +131,11 @@
       integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
       crossorigin="anonymous"
     ></script>
-    <script src="./src/utils.js"></script>
+    <script src="./src/Sound.js"></script>
     <script src="./src/Ball.js"></script>
     <script src="./src/Cell.js"></script>
     <script src="./src/GameOfLife.js"></script>
+    <script src="./src/utils.js"></script>
     <script src="./src/main.js"></script>
   </body>
 </html>

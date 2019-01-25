@@ -83,24 +83,41 @@ function checkCollision(object, game) {
 
 function gameOver(object) {
   if (object.radius < (2 * MAX_RADIUS) / 15 && !justGameOver) {
+  // if (object.radius < (2 * MAX_RADIUS) / 15) {
     justGameOver = true;
+    gameOverSound.play();
     ball.radius = 0;
     ball.speed = 0;
     stop();
     // initNewGame();
     setTimeout(() => {
       displayPage("game-over");
+    }, 1000);
+    setTimeout(() => {
       restart();
-    }, 500);
+    }, 1200);
     // setTimeout(() => (ball.radius = 10), 1400);
-    // setTimeout(() => (justGameOver = false), 20000);
+    setTimeout(() => (justGameOver = false), 20000);
     return true;
   } else {
     return false;
   }
 }
+function gameWin() {
+  blackHoleCloses.play();
+  // ball.radius = (2 * MAX_RADIUS) / 15;
+  ball.speed = 0;
+  mainWorld.splice(2, mainWorld.length - 2);
+  stop();
+  setTimeout(() => {
+    displayPage("game-win");
+  }, 1000);
+  setTimeout(() => {
+    restart();
+  }, 1200);
+}
 function restart() {
-  document.querySelector("#pause-play").innerHTML = "PAUSE";
+  // document.querySelector("#pause-play").innerHTML = "PAUSE";
   initNewGame();
   document.querySelector("#black-hole").classList.add("highlighted");
   document.querySelector(".item1").classList.remove("highlighted");
@@ -113,6 +130,12 @@ function restart() {
   document.querySelector(".item3").classList.remove("collected");
   document.querySelector(".item4").classList.remove("collected");
   document.querySelector(".item5").classList.remove("collected");
+  document.querySelector("#pause-play").style.display = "none";
+  document.querySelector("#start-restart").innerHTML = "START";
+  stop();
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "rgb(0, 0, 0)";
+  ctx.fillRect(0, 0, width, height);
 }
 
 function gainHealth(object) {

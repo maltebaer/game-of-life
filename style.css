@@ -10,9 +10,18 @@ h2 {
   font-size: 1.5em;
   text-align: center;
 }
+h3 {
+  /* margin: 0; */
+  font-size: 1.2em;
+  text-align: center;
+}
 
 .rules-container {
-  height: 75vh;
+  height: calc(100vh - 60px);
+}
+
+.content {
+  height: calc(100vh - 60px);
 }
 
 .item {
@@ -33,11 +42,15 @@ h2 {
 }
 
 canvas {
-  height: calc(100vh - 60px);
-  width: calc((2 / 3) * calc(100vh - 60px));
+  height: calc(100vh - 90px);
+  width: calc((2 / 3) * calc(100vh - 90px));
   margin: 0px 50px;
 }
 
 .control button {
   margin: 10px;
 }
+
+/* .box {
+  border: 1px solid red;
+} */

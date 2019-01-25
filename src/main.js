@@ -1,19 +1,15 @@
 // --- TO DO/IDEAS ---
 //  - add loading information
-//  - add explanation
-//  - add music
+//  - update explanation
+//  - add favicon
 //  - add color gradient
+//  - improve worlds
 //  - add ball size to checkCollision
-//  - make variables const
 //  - mobile version
 //  - implement area of visibility/just show frame around ball
 //    - make it round
-//  - make ball pixely
 //  - implement shooting feature
 //  - make black hole attract damage cells
-//  - make black hole erase all cells
-//  - implement initial conditions
-//    - patterns to collect in the other worlds
 
 /**************************** 
   --- GLOBAL VARIABLES ---
@@ -66,16 +62,28 @@ let justAccelerated = false;
 let populationDensity = 0.07;
 const MAX_AGE = false;
 
+// AUDIO
+let backgroundMusicOn = true;
+let niju;
+let portalSqueeze;
+let itemSound;
+let gameOverSound;
+let blackHoleBounce;
+let blackHoleCloses;
+
 // ANIMATION PROPERTIES
 let static = false;
 
+// GAME
 let setIntervalUsed = false;
-let setIntervalUsedModels = true;
-let intervalId;
-let frameRate = 100;
 let requestAnimationFrameUsed = true;
-let requestAnimationFrameUsedModels = false;
 let requestId;
+
+// MODELS
+let setIntervalUsedModels = true;
+let requestAnimationFrameUsedModels = false;
+let frameRate = 100;
+let intervalId;
 
 let justHitDamage;
 let justHitHealth;
@@ -167,6 +175,14 @@ function initModels() {
   item5Model = new GameOfLife(30, 30, 0);
   item5Model.setup("item", "pink", 0);
   item5Model.setupBipole(5, 5, "item", "pink");
+
+  // load audio
+  niju = new Sound("../audio/zazou-anonbest_ticogo_niju-remix.mp3");
+  portalSqueeze = new Sound("../audio/portal0.mp3");
+  itemSound = new Sound("../audio/item2.mp3");
+  gameOverSound = new Sound("../audio/gameOver.mp3");
+  blackHoleBounce = new Sound("../audio/blackHole-bounce.mp3");
+  blackHoleCloses = new Sound("../audio/blackHole-closes.mp3");
 
   models = [
     blackHoleModel,
@@ -310,6 +326,7 @@ function updateEverything(world) {
       ) {
         // console.log("checkCollision called PORTAL");
         justHitPortal = true;
+        portalSqueeze.play();
         let portal = checkCollision(world[2], world[i])[1];
         switch (portal) {
           case "portal1":
@@ -348,16 +365,10 @@ function updateEverything(world) {
       ) {
         // console.log("checkCollision called BLACK HOLE");
         justHitBlackHole = true;
-        if (itemsCollected === 0) {
-          ball.radius = 0;
-          ball.speed = 0;
-          mainWorld.splice(3, mainWorld.length - 3);
-          setTimeout(() => {
-            ball.radius = 50;
-            ball.x = 370;
-            ball.y = 570;
-          }, 1400);
+        if (itemsCollected === 5) {
+          gameWin();
         } else {
+          blackHoleBounce.play();
           ball.speed *= -0.2;
         }
         setTimeout(() => (justHitBlackHole = false), 500);
@@ -366,6 +377,7 @@ function updateEverything(world) {
         checkCollision(world[2], world[i])[1].includes("item")
       ) {
         // console.log("checkCollision called ITEM");
+        itemSound.play();
         switch (world[i]) {
           case item1:
             document.querySelector(".item1").classList.add("collected");
@@ -388,7 +400,7 @@ function updateEverything(world) {
         itemsCollected++;
       }
     }
-  } 
+  }
   // else {
   //   stop();
   // }
@@ -570,6 +582,9 @@ function displayPage(selectedPage) {
   for (var i = 0; i < $pages.length; i++) {
     // If the current page as the attribute data-page equals to the selectedPage
     if ($pages[i].getAttribute("data-page") === selectedPage) {
+      if ($pages[i].getAttribute("data-page") === "play" && backgroundMusicOn) {
+        niju.play();
+      }
       $pages[i].style.display = ""; // display the current page
     } else {
       $pages[i].style.display = "none"; // hide the current page
