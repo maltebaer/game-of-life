@@ -177,12 +177,13 @@ function initModels() {
   item5Model.setupBipole(5, 5, "item", "pink");
 
   // load audio
-  niju = new Sound("../audio/zazou-anonbest_ticogo_niju-remix.mp3");
-  portalSqueeze = new Sound("../audio/portal0.mp3");
-  itemSound = new Sound("../audio/item2.mp3");
-  gameOverSound = new Sound("../audio/gameOver.mp3");
-  blackHoleBounce = new Sound("../audio/blackHole-bounce.mp3");
-  blackHoleCloses = new Sound("../audio/blackHole-closes.mp3");
+  niju = new Audio("audio/zazou-anonbest_ticogo_niju-remix.mp3");
+  niju.load();
+  portalSqueeze = new Audio("audio/portal0.mp3");
+  itemSound = new Audio("audio/item2.mp3");
+  gameOverSound = new Audio("audio/gameOver.mp3");
+  blackHoleBounce = new Audio("audio/blackHole-bounce.mp3");
+  blackHoleCloses = new Audio("audio/blackHole-closes.mp3");
 
   models = [
     blackHoleModel,
