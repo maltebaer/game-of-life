@@ -221,7 +221,7 @@ function initNewGame() {
   damage1 = new GameOfLife(rows, cols);
   damage1.setup("damage", "red", 1 * populationDensity);
   landscape1 = new GameOfLife(rows, cols);
-  landscape1.setup("health", "yellow", 0.6 * populationDensity);
+  landscape1.setup("health", "silver", 0.6 * populationDensity);
   landscape1.setupPortal(20, 120, "portal1", "light blue", "horizontal");
   item1 = new GameOfLife(rows, cols);
   item1.setup("item", "pink", 0);
@@ -245,7 +245,7 @@ function initNewGame() {
   damage3 = new GameOfLife(rows, cols);
   damage3.setup("damage", "red", 1.1 * populationDensity);
   landscape3 = new GameOfLife(rows, cols);
-  landscape3.setup("health", "yellow", 0.9 * populationDensity);
+  landscape3.setup("health", "green", 0.9 * populationDensity);
   landscape3.setupPortal(90, 10, "portal3", "light blue", "horizontal");
   item3 = new GameOfLife(rows, cols);
   item3.setup("item", "pink", 0);
@@ -255,7 +255,7 @@ function initNewGame() {
 
   // WORLD4
   damage4 = new GameOfLife(rows, cols);
-  damage4.setup("damage", "red", 1.1 * populationDensity);
+  damage4.setup("damage", "red", 0.5 * populationDensity);
   landscape4 = new GameOfLife(rows, cols);
   landscape4.setup("health", "yellow", 0.9 * populationDensity);
   landscape4.setupPortal(10, 10, "portal4", "light blue", "vertical");
@@ -263,7 +263,7 @@ function initNewGame() {
   item4.setup("item", "pink", 0);
   item4.setupClock(90, 170, "item", "pink");
 
-  world4 = [4, "full", ball, damage4, landscape4, item4];
+  world4 = [4, "narrow", ball, damage4, landscape4, item4];
 
   // WORLD5
   damage5 = new GameOfLife(rows, cols);
@@ -413,6 +413,9 @@ function drawEverything(world) {
     switch (world[1]) {
       case "limited":
         world[i].drawLimitedSight(ctx, ball);
+        break;
+      case "narrow":
+        world[i].drawLimitedSightNarrow(ctx, ball);
         break;
 
       default:

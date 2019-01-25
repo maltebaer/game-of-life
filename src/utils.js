@@ -166,9 +166,13 @@ function cellColor(color, generationsDead = 0, i) {
     case "red":
       return `rgba(255, 20, 50, ${alpha})`;
     case "orange":
-      return `rgba(255, 204, 0, ${alpha})`;
+      return `rgba(255, 204, 153, ${alpha})`;
     case "blue":
       return `rgba(51, 51, 204, ${alpha})`;
+    case "green":
+      return `rgba(102, 255, 204, ${alpha})`;
+    case "silver":
+      return `rgba(102, 153, 153, ${alpha})`;
     case "pink":
       return `rgba(255, 102, 153, ${alpha})`;
 

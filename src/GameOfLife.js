@@ -494,6 +494,64 @@ class GameOfLife {
   drawLimitedSight(ctx, object) {
     let iArr = getPeriodicArray(convertBallToGrid(object.y - 165, resolution), 180, 4);
     let jArr = getPeriodicArray(convertBallToGrid(object.x - 140, resolution), 120, 3);
+    // let iArr = getPeriodicArray(convertBallToGrid(object.y - 60, resolution), 180, 10);
+    // let jArr = getPeriodicArray(convertBallToGrid(object.x - 140, resolution), 120, 1);
+
+    for (let i = 0; i < iArr.length; i++) {
+      for (let j = 0; j < jArr.length; j++) {
+        let y = iArr[i] * resolution;
+        let x = jArr[j] * resolution;
+
+        if (this.grid[iArr[i]][jArr[j]].state === 1) {
+          ctx.fillStyle = cellColor(this.grid[iArr[i]][jArr[j]].color);
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+        if (
+          this.grid[iArr[i]][jArr[j]].state === 0 &&
+          this.grid[iArr[i]][jArr[j]].generationsDead === 1
+        ) {
+          ctx.fillStyle = cellColor(
+            this.grid[iArr[i]][jArr[j]].color,
+            this.grid[iArr[i]][jArr[j]].generationsDead
+          );
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+        if (
+          this.grid[iArr[i]][jArr[j]].state === 0 &&
+          this.grid[iArr[i]][jArr[j]].generationsDead === 2
+        ) {
+          ctx.fillStyle = cellColor(
+            this.grid[iArr[i]][jArr[j]].color,
+            this.grid[iArr[i]][jArr[j]].generationsDead
+          );
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+        if (
+          this.grid[iArr[i]][jArr[j]].state === 0 &&
+          this.grid[iArr[i]][jArr[j]].generationsDead === 3
+        ) {
+          ctx.fillStyle = cellColor(
+            this.grid[iArr[i]][jArr[j]].color,
+            this.grid[iArr[i]][jArr[j]].generationsDead
+          );
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+        if (
+          this.grid[iArr[i]][jArr[j]].state === 0 &&
+          this.grid[iArr[i]][jArr[j]].generationsDead === 4
+        ) {
+          ctx.fillStyle = cellColor(
+            this.grid[iArr[i]][jArr[j]].color,
+            this.grid[iArr[i]][jArr[j]].generationsDead
+          );
+          ctx.fillRect(x, y, resolution, resolution);
+        }
+      }
+    }
+  }
+  drawLimitedSightNarrow(ctx, object) {
+    let iArr = getPeriodicArray(convertBallToGrid(object.y - 60, resolution), 180, 10);
+    let jArr = getPeriodicArray(convertBallToGrid(object.x - 140, resolution), 120, 1);
 
     for (let i = 0; i < iArr.length; i++) {
       for (let j = 0; j < jArr.length; j++) {
